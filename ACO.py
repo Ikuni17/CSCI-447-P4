@@ -6,8 +6,8 @@ December 7, 2017
 
 
 class Ant():
-    def __init__(self, x, y):
-        self.location = (x, y)
+    def __init__(self, max_dim):
+        self.location = None
         self.carrying = None
 
     def move(self, step):
@@ -20,7 +20,7 @@ class Ant():
         pass
 
 
-class Point():
+class Datum():
     def __init__(self, data):
         self.input_vector = data
 
@@ -29,8 +29,7 @@ class Point():
 
 
 class Grid():
-    def __init__(self, dimension, data, patch_size, gammas):
-        self.dimension = dimension
+    def __init__(self, dimension, data, patch_size=1, gammas=[1, 0.01, 0.01]):
         self.grid = None
         self.patch_size = patch_size
         self.gammas = gammas
@@ -44,19 +43,21 @@ class Grid():
     def prob_drop(self, ant):
         pass
 
+
+class ACO():
+    def __int__(self, data, patch_size=1, step_size=1):
+        length = len(data)
+        grid_size = length * 10
+        self.grid = Grid(grid_size, data)
+        self.ants = [Ant(grid_size) for x in range(length * 2)]
+        self.step_size = step_size
+
     def eval_clusters(self):
         pass
 
-class ACO():
-    def __int__(self, max_iter, num_ants, step_size):
-        self.max_iter = max_iter
-        self.num_ants = num_ants
-        self.grid = None
-        self.ants = None
-        self.step_size = step_size
-
-    def main(self):
+    def main(self, max_iter=10000):
         pass
+
 
 if __name__ == '__main__':
     print("Not implemented")

@@ -6,6 +6,7 @@ December 9, 2017
 
 from collections import OrderedDict
 import math
+from matplotlib import pyplot as plt
 import random
 
 
@@ -36,12 +37,15 @@ class Ant():
 
 # Class which represents the main ACO algorithm. Keeps track of the grid and the ants
 class ACO():
-    def __init__(self, data, patch_size=1, step_size=1, gammas=[0.1, 0.01, 0.5]):
+    def __init__(self, data, patch_size=1, step_size=1, gammas=[1, 0.5, 0.5]):
         # Find how large the dataset is and determine the grid size and amount of ants based on that
         length = len(data)
+        # Make a grid which has 10 times as many locations as data points
+        #self.grid_size = math.ceil(math.sqrt(length * 10))
         self.grid_size = length * 10
         # OrderedDict where the keys are tuples for coordinates (x, y), and the value is a dictionary
         self.grid = self.init_grid(self.grid_size, data)
+        # Create twice as many ants as data points
         self.ants = self.init_ants(length * 2)
         # The search space of the ants
         self.patch_size = patch_size
@@ -135,9 +139,36 @@ class ACO():
             return 1
 
     def eval_clusters(self):
+        datum_x = []
+        datum_y = []
+        ant_x = []
+        ant_y = []
+        both_x = []
+        both_y = []
+        colors = ['yellow', 'gray', 'pink', 'orange', 'black', 'blue', 'red', 'green', 'purple']
+
         for k, v in self.grid.items():
-            if v['Datum'] is not None:
-                print(k)
+            if v['Datum'] is not None and v['Ant'] is None:
+                datum_x.append(k[0])
+                datum_y.append(k[1])
+            elif v['Datum'] is None and v['Ant'] is not None:
+                ant_x.append(k[0])
+                ant_y.append(k[1])
+            elif v['Datum'] is not None and v['Ant'] is not None:
+                both_x.append(k[0])
+                both_y.append(k[1])
+
+        print("Plotting:", len(datum_x))
+        plt.figure(figsize=(25.5, 13.5), dpi=100)
+        plt.scatter(datum_x, datum_y, c=colors[5], label='Data')
+        plt.scatter(ant_x, ant_y, c=colors[6], label='Ants')
+        plt.scatter(both_x, both_y, c=colors[4], label='Both')
+        plt.legend()
+        plt.grid()
+        plt.title(
+            "ACO: $\gamma={0}, \gamma_1={1}, \gamma_2={2}$".format(self.gammas[0], self.gammas[1], self.gammas[2]))
+        plt.savefig('tuning\\ACO-{0}.pdf'.format(str(self.gammas)))
+        plt.show()
 
     # Find a valid position for an ant to move to within step size
     def find_valid_pos(self, ant):
@@ -165,7 +196,7 @@ class ACO():
             return rand_pos
 
     # Main ACO algorithm based on the Lumer-Faieta algorithm
-    def main(self, max_iter=10000):
+    def main(self, max_iter=100000):
         for i in range(max_iter):
             if i % 10000 == 0:
                 print("Current iteration:", i)
@@ -177,6 +208,21 @@ class ACO():
                 # If the ant is carrying a datum and there is a spot available, try to place it on the grid
                 elif ant.carrying is not None and self.grid[ant.location]['Datum'] is None:
                     ant.drop(self.prob_drop(ant), self.grid)
+
+                # Find a valid postion for the ant to move to, then update its position
+                rand_pos = self.find_valid_pos(ant)
+                self.grid[ant.location]['Ant'] = None
+                self.grid[rand_pos]['Ant'] = ant
+                ant.location = rand_pos
+
+        while len(self.ants) > 0:
+            print("Remaining ants:", len(self.ants))
+            for ant in self.ants:
+                if ant.carrying is None:
+                    self.ants.remove(ant)
+
+                if self.grid[ant.location]['Datum'] is None:
+                    ant.drop(1, self.grid)
 
                 # Find a valid postion for the ant to move to, then update its position
                 rand_pos = self.find_valid_pos(ant)

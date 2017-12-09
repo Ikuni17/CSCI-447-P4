@@ -17,7 +17,8 @@ def get_dataset(csv_path):
 
 def load_datasets():
     # Dataset names
-    csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
+    #csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
+    csv_names = ['machine']
     # Dictionary with dataset name as the key and a 2D list of vectors as the value
     datasets = {}
 
@@ -34,7 +35,23 @@ def gen_data():
 def main():
     datasets = load_datasets()
     aco = ACO.ACO(data=datasets['machine'])
-    aco.main(max_iter=1000000)
+    aco.main(max_iter=10000)
+    '''aco = ACO.ACO(data=datasets['machine'], gammas=[1, 0.1, 0.5])
+    aco.main(max_iter=100000)
+    aco = ACO.ACO(data=datasets['machine'], gammas=[1, 0.5, 0.5])
+    aco.main(max_iter=100000)
+    aco = ACO.ACO(data=datasets['machine'], gammas=[1, 0.7, 0.5])
+    aco.main(max_iter=100000)
+    aco = ACO.ACO(data=datasets['machine'], gammas=[1, 0.9, 0.5])
+    aco.main(max_iter=100000)
+    aco = ACO.ACO(data=datasets['machine'], gammas=[1, 0.1, 0.1])
+    aco.main(max_iter=100000)
+    aco = ACO.ACO(data=datasets['machine'], gammas=[1, 0.1, 0.3])
+    aco.main(max_iter=100000)
+    aco = ACO.ACO(data=datasets['machine'], gammas=[1, 0.1, 0.7])
+    aco.main(max_iter=100000)
+    aco = ACO.ACO(data=datasets['machine'], gammas=[1, 0.1, 0.9])
+    aco.main(max_iter=100000)'''
 
 def graph2dClusters(data):
     for cluster in data:

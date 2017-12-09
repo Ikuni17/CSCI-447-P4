@@ -18,17 +18,11 @@ def random_vectors(n, d):
 	return out
 
 
-def generate_clustered_data(num_clusters, dimensions, num_data_points):
-	centers = random_vectors(num_clusters, dimensions)
-	data = []
-
-	for i in range(num_data_points):
-		temp = []
-		center = random.randrange(len(centers))
-		for j in range(dimensions):
-			temp.append(random.random() * centers[center][j])
-		data.append(temp)
-	return centers, data
+def select_random_vectors(n, data):
+	output = []
+	for i in range(n):
+		output.append(data[random.random() * len(data)])
+	return output
 
 
 def update_winner(input, winner, epsilon):
@@ -62,22 +56,18 @@ def compete(input, reference_vectors, epsilon):
 	update_winner(input, reference_vectors[min_index], epsilon)
 
 
-def train(epsilon, epsilon_step, num_reference_vectors):
-	dimensions = 2
-	num_data_points = 1000
 
-	centers, data = generate_clustered_data(num_reference_vectors, dimensions, num_data_points)
-	print('Actual Centers: ')
-	print_vectors(centers)
-	index = 0
+def train(data, num_clusters, epsilon, epsilon_step):
+	dimensions = len(data[0])
+	num_data_points = len(data)
 
-	reference_vectors = random_vectors(num_reference_vectors, dimensions)
+	reference_vectors = select_random_vectors(num_clusters, data)
 	print('Starting: ')
-	print_vectors(reference_vectors)
 
 	while epsilon > 0:
 		if index >= len(data):
 			index = 0
+		print_vectors(reference_vectors)
 		compete(data[index], reference_vectors, epsilon)
 		index += 1
 		epsilon -= epsilon_step
@@ -90,8 +80,7 @@ def train(epsilon, epsilon_step, num_reference_vectors):
 
 
 def main():
-	train(.9, 0.000001, 2)
-
+	print(str(generate_random_vectors(4, 2, 10)))
 
 if __name__ == '__main__':
 	main()

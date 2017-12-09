@@ -148,16 +148,18 @@ class ACO():
         max_y = min(self.grid_size, ant.location[1] + self.step_size)
         # Fail safe if an ant is stuck, i.e. its surrounded by ants and cannot move
         i = 0
+        max_tries = 100
 
         # Move the ant to an available spot within step size
         rand_pos = (random.randint(min_x, max_x), random.randint(min_y, max_y))
         # Loop until we have a point in the grid which isn't taken
-        while self.grid[rand_pos]['Ant'] is not None and i <= (self.step_size * 1000):
+        while self.grid[rand_pos]['Ant'] is not None and i <= (self.step_size * max_tries):
             rand_pos = (random.randint(min_x, max_x), random.randint(min_y, max_y))
             i += 1
 
         # If we reached the fail safe, just leave the ant and hope another moves before the next iteration
-        if i == (self.step_size * 1000):
+        if i == (self.step_size * max_tries):
+            # print("Ant stuck:", ant)
             return ant.location
         else:
             return rand_pos
@@ -165,6 +167,8 @@ class ACO():
     # Main ACO algorithm based on the Lumer-Faieta algorithm
     def main(self, max_iter=10000):
         for i in range(max_iter):
+            if i % 10000 == 0:
+                print("Current iteration:", i)
             # Iterate through all ants
             for ant in self.ants:
                 # If the ant is not carrying anything and there is a datum available, try to pick it up
@@ -185,4 +189,4 @@ class ACO():
 
 if __name__ == '__main__':
     aco = ACO(data=[[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3]])
-    aco.main(1000000)
+    aco.main(100000)

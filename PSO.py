@@ -23,7 +23,7 @@ class Particle:
     # calculate the distance of the clusters and update gbest and pbest
     def evaluate(self, data):
         clusters = KM.associate_data(clusterPositions, data)
-        
+
         # TODO: Calculate the performancehere
         averageDist = 0
 
@@ -31,7 +31,7 @@ class Particle:
         if averageDist < Particle.gbest:
             Particle.gbest = averageDist
             Particle.pbest = averageDist
-        else if averageDist < self.pbest:
+        elif averageDist < self.pbest:
             Particle.pbest = averageDist
 
     def calcVelocity(self):

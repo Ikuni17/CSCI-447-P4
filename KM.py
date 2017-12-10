@@ -26,7 +26,7 @@ def calculate_centroid(cluster):
     cluster = np.array(cluster)
     cluster_avg = np.zeros_like(cluster)
     for point in cluster:
-        print(str(point))
+        #print(str(point))
         cluster_avg = np.add(point, cluster_avg)
     cluster_avg = np.divide(cluster_avg, len(cluster))
 
@@ -63,7 +63,7 @@ def print_vectors(title, input):
 def train(data, k):
     # select k initial centers randomly from data
     centers = select_random_vectors(k, data)
-    print_vectors('Centers:', centers)
+    #print_vectors('Centers:', centers)
 
     old_centers_hash = hash(str([1]))
     centers_hash = hash(str(centers))
@@ -75,7 +75,9 @@ def train(data, k):
 
         centers_hash = hash(str(centers))
         old_centers = tuple(centers)
-        print_vectors('Centers:', centers)
+        #print_vectors('Centers:', centers)
+
+    return clusters
 
 
 def select_random_vectors(n, data):

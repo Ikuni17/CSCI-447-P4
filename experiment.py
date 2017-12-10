@@ -47,11 +47,14 @@ def main():
 
 
 def graph2dClusters(data):
-    for cluster in data:
+    for cluster in data.values():
         xVal = [x[0] for x in cluster]
         yVal = [y[1] for y in cluster]
         plt.scatter(xVal, yVal, linestyle='None', marker = ".")
+
     plt.show()
 
 if __name__ == '__main__':
-    KM.train(gen_data(), 3)
+    clusters = KM.train(gen_data(), 10)
+    print(clusters)
+    graph2dClusters(clusters)

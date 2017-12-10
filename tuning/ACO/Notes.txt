@@ -1,0 +1,9 @@
+Naming:
+ACO-[Gamma, Gamma_1, Gamma_2]-Iterations, Ants/Data Ratio, Patch Size
+
+- Grid Size: Too large and no clusters form. Text recommends 10 times data points
+- Num_Ants: More ants makes the clusters slightly tighter, but increase computation time significantly
+- Gamma: Too high and won't pickup, too low and cannot drop
+- Gamma_1: Too high and ants won't even pickup, so very little clustering.
+- Gamma_2: Defines clusters better with higher numbers otherwise they just drop points instantly.
+- Patch_Size: Too large the ants have too much information and one big "cluster", or just randomly placing essentially.

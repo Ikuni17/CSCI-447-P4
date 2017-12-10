@@ -50,12 +50,12 @@ def compete(input, reference_vectors):
 	return min_index
 
 
-def train(data, num_clusters, epsilon, epsilon_step):
+def train(data, num_clusters, epsilon_step =  0.001, epsilon = 1):
 	dimensions = len(data[0])
 	num_data_points = len(data)
 
 	reference_vectors = select_random_vectors(num_clusters, data)
-	print_vectors('Starting:', reference_vectors)
+	# print_vectors('Starting:', reference_vectors)
 
 	index = 0
 	while epsilon > 0:
@@ -67,7 +67,7 @@ def train(data, num_clusters, epsilon, epsilon_step):
 		epsilon -= epsilon_step
 
 	# final pass
-	print_vectors('Centers:', reference_vectors)
+	# print_vectors('Centers:', reference_vectors)
 
 	clusters = {}
 	for point in data:
@@ -76,8 +76,9 @@ def train(data, num_clusters, epsilon, epsilon_step):
 			clusters[winner_index] = [point]
 		else:
 			clusters[winner_index].append(point)
-	print_clusters(clusters)
-
+	# print_clusters(clusters)
+	# print(type(clusters))
+	return clusters
 
 
 

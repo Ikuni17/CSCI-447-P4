@@ -5,6 +5,10 @@ December 9, 2017
 '''
 
 import ACO
+import CL
+import DB
+import KM
+import PSO
 import pandas
 import matplotlib.pyplot as plt
 import numpy as np
@@ -50,4 +54,4 @@ def graph2dClusters(data):
     plt.show()
 
 if __name__ == '__main__':
-    main()
+    KM.train(gen_data(), 3)

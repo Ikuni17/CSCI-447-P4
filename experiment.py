@@ -60,23 +60,23 @@ def process_pairs(data):
 
 
 def test_CL():
-    cluster_size = 1000
-    num_clusters = 10
-    epsilon_step = .001
+    cluster_size = 10000
+    num_clusters = 5
+    epsilon_step = .0000001
     magnitude = 10
 
-    mu = []
-    sigma = []
-    for i in range(num_clusters):
-        mu.append(random.random() * magnitude)
-        sigma.append(random.random() * magnitude)
-    data = gen_data(mu, sigma, cluster_size, magnitude)
-    print('CL-[' + str(num_clusters) + ', ' + str(epsilon_step) + '].png')
+    # mu = []
+    # sigma = []
+    # for i in range(num_clusters):
+    #     mu.append(random.random() * magnitude)
+    #     sigma.append(random.random() * magnitude)
+    # data = gen_data(mu, sigma, cluster_size, magnitude)
+    # print('CL-[' + str(num_clusters) + ', ' + str(epsilon_step) + '].png')
 
 
-    # path = 'bean'
-    # data = get_dataset(path + '.csv')
-    # print('CL-[' + str(num_clusters) + ', ' + str(epsilon_step) + ', ' + path + '].png')
+    path = 'bean'
+    data = get_dataset(path + '.csv')
+    print('CL-[' + str(num_clusters) + ', ' + str(epsilon_step) + ', ' + path + '].png')
 
 
     clusters = CL.train(data, num_clusters, epsilon_step)

@@ -38,12 +38,17 @@ def gen_data():
 
 def main():
     datasets = load_datasets()
-    #csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
-    csv_names = ['airfoil', 'concrete', 'forestfires', 'yacht']
+    csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
+    #csv_names = ['airfoil', 'concrete', 'forestfires', 'yacht']
 
-    for name in csv_names:
+    '''for name in csv_names:
         aco = ACO.ACO(data=datasets[name])
-        aco.main(name)
+        aco.main(name)'''
+
+    #clusters = KM.train(gen_data(), 3)
+    clusters = KM.train(gen_data(), 3)
+    print(clusters)
+    graph2dClusters(clusters)
 
 
 def graph2dClusters(data):
@@ -55,6 +60,4 @@ def graph2dClusters(data):
     plt.show()
 
 if __name__ == '__main__':
-    clusters = KM.train(gen_data(), 10)
-    print(clusters)
-    graph2dClusters(clusters)
+    main()

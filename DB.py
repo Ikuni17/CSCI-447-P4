@@ -29,10 +29,17 @@ def DBScan(data, min_distance):
 							labels[current_point] = cluster_id
 							cluster.append(data[current_point])
 
-
 			cluster_id += 1
 		if cluster:
 			clusters.append(cluster)
+
+	noise = []
+	for i in range(len(labels)):
+		if labels[i] == None:
+			noise.append(data[i])
+			labels[i] = cluster_id
+	print(noise)
+	cluster.append(noise)
 	return clusters
 
 def expand_cluster(point, data, labels, min_distance, cluster_id, cluster):

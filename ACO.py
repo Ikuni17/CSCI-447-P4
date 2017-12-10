@@ -37,17 +37,17 @@ class Ant():
 
 # Class which represents the main ACO algorithm. Keeps track of the grid and the ants
 class ACO():
-    def __init__(self, data, patch_size=1, step_size=1, gammas=[1, 0.5, 0.5]):
+    def __init__(self, data, patch_size=3, step_size=1, gammas=[50000, 0.1, 0.7]):
         # Find how large the dataset is and determine the grid size and amount of ants based on that
         length = len(data)
         # Make a grid which has 10 times as many locations as data points
-        #self.grid_size = math.ceil(math.sqrt(length * 10))
-        self.grid_size = length * 10
+        self.grid_size = math.ceil(math.sqrt(length * 10))
         # OrderedDict where the keys are tuples for coordinates (x, y), and the value is a dictionary
         self.grid = self.init_grid(self.grid_size, data)
         # Create twice as many ants as data points
-        self.ants = self.init_ants(length * 2)
+        self.ants = self.init_ants(int(length / 10))
         # The search space of the ants
+        #self.patch_size = math.ceil(length * 0.024) 5
         self.patch_size = patch_size
         # The amount of spaces an ant can move per move
         self.step_size = step_size
@@ -138,7 +138,7 @@ class ACO():
         else:
             return 1
 
-    def eval_clusters(self):
+    def eval_clusters(self, name):
         datum_x = []
         datum_y = []
         ant_x = []
@@ -148,27 +148,28 @@ class ACO():
         colors = ['yellow', 'gray', 'pink', 'orange', 'black', 'blue', 'red', 'green', 'purple']
 
         for k, v in self.grid.items():
-            if v['Datum'] is not None and v['Ant'] is None:
+            # if v['Datum'] is not None and v['Ant'] is None:
+            if v['Datum'] is not None:
                 datum_x.append(k[0])
                 datum_y.append(k[1])
-            elif v['Datum'] is None and v['Ant'] is not None:
+            '''elif v['Datum'] is None and v['Ant'] is not None:
                 ant_x.append(k[0])
                 ant_y.append(k[1])
             elif v['Datum'] is not None and v['Ant'] is not None:
                 both_x.append(k[0])
-                both_y.append(k[1])
+                both_y.append(k[1])'''
 
-        print("Plotting:", len(datum_x))
+        # print("Plotting:", len(datum_x))
         plt.figure(figsize=(25.5, 13.5), dpi=100)
         plt.scatter(datum_x, datum_y, c=colors[5], label='Data')
-        plt.scatter(ant_x, ant_y, c=colors[6], label='Ants')
-        plt.scatter(both_x, both_y, c=colors[4], label='Both')
+        # plt.scatter(ant_x, ant_y, c=colors[6], label='Ants')
+        # plt.scatter(both_x, both_y, c=colors[4], label='Both')
         plt.legend()
         plt.grid()
         plt.title(
             "ACO: $\gamma={0}, \gamma_1={1}, \gamma_2={2}$".format(self.gammas[0], self.gammas[1], self.gammas[2]))
-        plt.savefig('tuning\\ACO-{0}.pdf'.format(str(self.gammas)))
-        plt.show()
+        plt.savefig('tuning\\ACO\\ACO-{2}, {0}-1M, 10%, {1}.png'.format(str(self.gammas), self.patch_size, name))
+        # plt.show()
 
     # Find a valid position for an ant to move to within step size
     def find_valid_pos(self, ant):
@@ -190,13 +191,12 @@ class ACO():
 
         # If we reached the fail safe, just leave the ant and hope another moves before the next iteration
         if i == (self.step_size * max_tries):
-            # print("Ant stuck:", ant)
             return ant.location
         else:
             return rand_pos
 
     # Main ACO algorithm based on the Lumer-Faieta algorithm
-    def main(self, max_iter=100000):
+    def main(self, name, max_iter=1000000):
         for i in range(max_iter):
             if i % 10000 == 0:
                 print("Current iteration:", i)
@@ -215,14 +215,16 @@ class ACO():
                 self.grid[rand_pos]['Ant'] = ant
                 ant.location = rand_pos
 
+        # Make all the ants drop any datums they happen to be carrying at the end of iterations. They will find the
+        # proper location before dropping.
         while len(self.ants) > 0:
-            print("Remaining ants:", len(self.ants))
             for ant in self.ants:
                 if ant.carrying is None:
                     self.ants.remove(ant)
 
-                if self.grid[ant.location]['Datum'] is None:
-                    ant.drop(1, self.grid)
+                # Try to drop the point
+                if ant.carrying is not None and self.grid[ant.location]['Datum'] is None:
+                    ant.drop(self.prob_drop(ant), self.grid)
 
                 # Find a valid postion for the ant to move to, then update its position
                 rand_pos = self.find_valid_pos(ant)
@@ -230,7 +232,7 @@ class ACO():
                 self.grid[rand_pos]['Ant'] = ant
                 ant.location = rand_pos
 
-        self.eval_clusters()
+        self.eval_clusters(name)
 
 
 if __name__ == '__main__':

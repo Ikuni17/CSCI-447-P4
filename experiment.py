@@ -5,6 +5,10 @@ December 9, 2017
 '''
 
 import ACO
+import CL
+import DB
+import KM
+import PSO
 import pandas
 import matplotlib.pyplot as plt
 import numpy as np
@@ -17,8 +21,8 @@ def get_dataset(csv_path):
 
 def load_datasets():
     # Dataset names
-    #csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
-    csv_names = ['machine']
+    csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
+    #csv_names = ['machine']
     # Dictionary with dataset name as the key and a 2D list of vectors as the value
     datasets = {}
 
@@ -34,30 +38,25 @@ def gen_data():
 
 def main():
     datasets = load_datasets()
-    aco = ACO.ACO(data=datasets['machine'])
-    aco.main(max_iter=10000)
-    '''aco = ACO.ACO(data=datasets['machine'], gammas=[1, 0.1, 0.5])
-    aco.main(max_iter=100000)
-    aco = ACO.ACO(data=datasets['machine'], gammas=[1, 0.5, 0.5])
-    aco.main(max_iter=100000)
-    aco = ACO.ACO(data=datasets['machine'], gammas=[1, 0.7, 0.5])
-    aco.main(max_iter=100000)
-    aco = ACO.ACO(data=datasets['machine'], gammas=[1, 0.9, 0.5])
-    aco.main(max_iter=100000)
-    aco = ACO.ACO(data=datasets['machine'], gammas=[1, 0.1, 0.1])
-    aco.main(max_iter=100000)
-    aco = ACO.ACO(data=datasets['machine'], gammas=[1, 0.1, 0.3])
-    aco.main(max_iter=100000)
-    aco = ACO.ACO(data=datasets['machine'], gammas=[1, 0.1, 0.7])
-    aco.main(max_iter=100000)
-    aco = ACO.ACO(data=datasets['machine'], gammas=[1, 0.1, 0.9])
-    aco.main(max_iter=100000)'''
+    csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
+    #csv_names = ['airfoil', 'concrete', 'forestfires', 'yacht']
+
+    '''for name in csv_names:
+        aco = ACO.ACO(data=datasets[name])
+        aco.main(name)'''
+
+    #clusters = KM.train(gen_data(), 3)
+    clusters = KM.train(gen_data(), 3)
+    print(clusters)
+    graph2dClusters(clusters)
+
 
 def graph2dClusters(data):
-    for cluster in data:
+    for cluster in data.values():
         xVal = [x[0] for x in cluster]
         yVal = [y[1] for y in cluster]
         plt.scatter(xVal, yVal, linestyle='None', marker = ".")
+
     plt.show()
 
 if __name__ == '__main__':

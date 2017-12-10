@@ -14,8 +14,22 @@ def DBScan(data, min_distance):
 	cluster_id = 0
 	for point in range(len(data)):
 		cluster = []
-		if labels[point] == None:
-			expand_cluster(point, data, labels, min_distance, cluster_id, cluster)
+		points_to_process = [point]
+		while points_to_process:
+			current_point = points_to_process.pop(0)
+			neighbors = get_neighbors(data[current_point], data, min_distance)
+			if labels[current_point] == None:
+				if len(neighbors) > 4:
+					labels[current_point] = cluster_id
+					cluster.append(data[current_point])
+					points_to_process = points_to_process + neighbors
+				elif len(neighbors) > 0:
+					for neighbor in neighbors:
+						if labels[neighbor] != None and labels[neighbor] == cluster_id:
+							labels[current_point] = cluster_id
+							cluster.append(data[current_point])
+
+
 			cluster_id += 1
 		if cluster:
 			clusters.append(cluster)
@@ -92,7 +106,7 @@ if __name__ == '__main__':
 	# print(str(min_distance))
 	dbscan = DBScan(data, min_distance)
 	print('Average distance to center of cluster: {0}, number of clusters: {1}'.format(experiment.evaluate_clusters(dbscan), len(dbscan)))
-	experiment.graph2dClusters(dbscan)
+	# experiment.graph2dClusters(dbscan)
 	# print(str(dbscan))
 	# for i in dbscan:
 	#	print('cluster:')

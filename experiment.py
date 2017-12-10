@@ -82,7 +82,7 @@ def evaluate_clusters(clusters):
         center_point = [0]*len(cluster[0])
         num_points = num_points + len(cluster)
 
-        # Calculate the average in each dimension
+        # Calculate the average in each dimension for the cluster
         for i in range(len(center_point)):
             dimCut = [dim[i] for dim in cluster]
             center_point[i] = sum(dimCut)/len(dimCut)

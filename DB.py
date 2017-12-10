@@ -1,6 +1,9 @@
 import CL
 import KM
 import pandas
+import copy
+import random
+import matplotlib.pyplot as plt
 
 min_neighbors = 4
 
@@ -32,6 +35,36 @@ def expand_cluster(point, data, labels, min_distance, cluster_id, cluster):
 				cluster.append(data[point])
 
 
+def calc_distance_to_kth(data, sample_size, k):
+	sample = []
+	data = copy.deepcopy(data)
+
+	if sample_size > len(data):
+		sample_size = len(data)
+
+	for i in range(sample_size):
+		sample.append(data.pop(int(random.random() * sample_size)))
+		sample_size -= 1
+
+	kth_distances = []
+	for point in sample:
+		distances = []
+		for other_point in sample:
+			distances.append(KM.euclidian_distance(point, other_point))
+		distances.sort()
+		kth_distances.append(distances[k - 1])
+
+	kth_distances = list(filter(lambda a: a != 0.0, kth_distances))
+	kth_distances = list(filter(lambda a: a != None, kth_distances))
+	# for i in range(500):
+		# print(distances[i])
+	# return distances[k]
+	kth_distances.sort()
+	plt.plot(kth_distances)
+	plt.show()
+
+	return int(input('Please enter the y value where exponential increase begins: '))
+
 
 def get_neighbors(point, data, min_distance):
 	neighbors = []
@@ -52,10 +85,14 @@ def read_data(path):
 
 
 if __name__ == '__main__':
-	data = read_data('datasets/airfoil.csv')
-	min_distance = 500
+	data = read_data('datasets/machine.csv')
+	sample_size = 10000
+	k = 4
+	min_distance = calc_distance_to_kth(data, sample_size, k)
+	# min_distance = 50
+	print(str(min_distance))
 	dbscan = DBScan(data, min_distance)
-	print(type(dbscan))
+	# print(str(dbscan))
 	for i in dbscan:
 		print('cluster:')
 		for point in i:

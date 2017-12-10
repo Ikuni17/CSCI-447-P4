@@ -61,8 +61,4 @@ def graph2dClusters(data):
     plt.show()
 
 if __name__ == '__main__':
-    #main()
-    graph_data=[] # Putting this into an array to represent a single cluster for testing
-    graph_data.append(gen_data())
-    graph_data.append(gen_data())
-    graph2dClusters(graph_data)
+    main()

@@ -20,10 +20,7 @@ def get_dataset(csv_path):
     return df.values.tolist()
 
 
-def load_datasets():
-    # Dataset names
-    csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
-    # csv_names = ['machine']
+def load_datasets(csv_names):
     # Dictionary with dataset name as the key and a 2D list of vectors as the value
     datasets = {}
 
@@ -41,17 +38,17 @@ def gen_data():
 
 
 def main():
-    datasets = load_datasets()
     csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
+    datasets = load_datasets(csv_names)
 
     '''for name in csv_names:
         aco = ACO.ACO(data=datasets[name])
         aco.main(name)'''
 
-    clusters = KM.train(gen_data(), 3)
+    '''clusters = KM.train(gen_data(), 5)
     print(clusters)
-    graph2dClusters(clusters)
-    # test_KM(datasets, csv_names)
+    graph2dClusters(clusters)'''
+    test_KM(datasets, csv_names)
 
 
 def test_KM(datasets, csv_names):
@@ -66,7 +63,7 @@ def test_KM(datasets, csv_names):
                     if len(clusters[key]) == 0:
                         results[name][k] += 1
 
-        print(results)
+    print(results)
 
 
 def graph2dClusters(data):

@@ -27,12 +27,16 @@ def calculate_centroids(clusters):
 
 def calculate_centroid(cluster):
     cluster = np.array(cluster)
-    cluster_avg = np.zeros_like(cluster)
+    try:
+        cluster_avg = np.zeros_like(cluster[0])
+    except(IndexError):
+        return np.inf
     for point in cluster:
-        # print(str(point))
+        #print(str(point))
         cluster_avg = np.add(point, cluster_avg)
     cluster_avg = np.divide(cluster_avg, len(cluster))
 
+    #print(cluster_avg)
     return cluster_avg
 
 
@@ -49,23 +53,14 @@ def associate_data(k, centers, data):
         minimum = math.inf
 
         for center_index in range(len(centers)):
-            '''if len(centers[center_index]) == 0:
-                continue
-            else:'''
             try:
                 temp_distance = euclidian_distance(point, centers[center_index])
             except(ValueError):
                 continue
-                '''print("Point:", point)
-                print("Center:", centers[center_index])
-                exit()'''
             if temp_distance < minimum:
                 minimum = temp_distance
                 min_index = center_index
 
-        '''if min_index not in clusters:
-            clusters[min_index] = [point]
-        else:'''
         clusters[min_index].append(point)
     # pprint.pprint(clusters)
     #print("End Assoc:", len(clusters.keys()))

@@ -74,24 +74,24 @@ def get_neighbors(point, data, min_distance):
 	return neighbors
 
 
-def get_group(point, data, min_distance):
-	group = []
-	return group
-
-
 def read_data(path):
 	df = pandas.read_csv(path, header=None)
 	return df.values.tolist()
 
 
 if __name__ == '__main__':
-	data = read_data('datasets/machine.csv')
-	sample_size = 10000
+	data = read_data('data/HTRU2/HTRU_2.csv')
+	max_data_size = 6000
+	if len(data) > max_data_size:
+		new_data = []
+		for i in range(max_data_size):
+			new_data.append(data.pop(int(random.random() * len(data))))
+	sample_size = 5000
 	k = 4
-	min_distance = calc_distance_to_kth(data, sample_size, k)
+	min_distance = calc_distance_to_kth(new_data, sample_size, k)
 	# min_distance = 50
-	print(str(min_distance))
-	dbscan = DBScan(data, min_distance)
+	# print(str(min_distance))
+	dbscan = DBScan(new_data, min_distance)
 	# print(str(dbscan))
 	for i in dbscan:
 		print('cluster:')

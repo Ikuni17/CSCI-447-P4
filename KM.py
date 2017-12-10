@@ -1,35 +1,98 @@
-def train(self):
-    training_data = self.training_data
-    hidden_layer = self.hidden_layer
-    clusters = self.clusters
+import numpy as np
+from copy import deepcopy
+import pandas
+import random
+import pprint
 
-    converged = False
-    while not converged:
-        converged = True
-        # initialize clusters
-        for i in range(0, len(training_data) - 1):
-            temp_index = None
-            temp_min = None
-            for j in range(len(hidden_layer) - 1):
-                # to not include outputs in distance calculation
-                # if temp_min == None or np.linalg.norm(training_data[i][:len(training_data[i]) -1] - hidden_layer[j][:len(hidden_layer[j]) - 1]
-                if temp_min == None or np.linalg.norm(np.array(training_data[i]) - np.array(hidden_layer[j].center)) < temp_min:
-                    temp_min =  np.linalg.norm(np.array(training_data[i]) - np.array(hidden_layer[j].center))
-                    temp_index = j
-            clusters[temp_index].append(i)
+def euclidian_distance(vector_a, vector_b):
+	a = np.array(vector_a)
+	b = np.array(vector_b)
+	# print(str(np.linalg.norm(a-b)))
+	return np.linalg.norm(a-b)
 
-        # Calculates new centers
-        average = [0] * len(clusters[0])
-        for i in range(len(clusters) - 1):
-            for item in average:
-                item = 0
-            if i == 1:
-                print(average)
-            # For every index in cluster
-            for j in range(len(clusters[i]) - 1):
-                average = [x + y for x, y in zip(average, training_data[clusters[i][j]])]
+# takes a list of clusters, where a cluster is a list of data points
+def calculate_centroids(clusters):
+	centroids = []
+	for cluster_key in clusters.keys():
+		centroids.append(calculate_centroid(clusters[cluster_key]))
+	return centroids
 
-            average = [x/len(clusters[i]) for x in average]
-            if average != hidden_layer[i].center:
-                converged = False
-                hidden_layer[i].center = average
+
+def calculate_centroid(cluster):
+	cluster = np.array(cluster)
+	cluster_avg = np.zeros_like(cluster)
+	for point in cluster:
+		print(str(point))
+		cluster_avg = np.add(point, cluster_avg)
+	cluster_avg = np.divide(cluster_avg, len(cluster))
+
+
+	return cluster_avg
+
+
+def associate_data(centers, data):
+	clusters = {}
+	for point in data:
+		min_index = 0
+		min = euclidian_distance(point, centers[0])
+
+		for center_index in range(len(centers)):
+			temp_distance = euclidian_distance(point, centers[center_index])
+			if temp_distance < min:
+				min = temp_distance
+				min_index = center_index
+
+		if min_index not in clusters:
+			clusters[min_index] = [point]
+		else:
+			clusters[min_index].append(point)
+	# pprint.pprint(clusters)
+	return clusters
+
+
+def print_vectors(title, input):
+	print(title + 'of length ' + str(len(input)))
+	for i in input:
+		print(i)
+	print('\n')
+
+
+def train(data, k):
+	# select k initial centers randomly from data
+	centers = select_random_vectors(k, data)
+	print_vectors('Centers:', centers)
+
+	old_centers_hash = hash(str([1]))
+	centers_hash = hash(str(centers))
+	while old_centers_hash != centers_hash:
+		old_centers_hash = hash(str(centers))
+
+		clusters = associate_data(centers, data)
+		centers = calculate_centroids(clusters)
+
+		centers_hash = hash(str(centers))
+		old_centers = tuple(centers)
+		print_vectors('Centers:', centers)
+
+
+
+def select_random_vectors(n, data):
+	output = []
+	for i in range(n):
+		output.append(data[int(random.random() * len(data))])
+	return output
+
+
+def read_data(path):
+	df = pandas.read_csv(path, header=None)
+	return df.values.tolist()
+
+
+def main():
+	data = read_data('datasets/machine.csv')
+	# data = [[1, 1, 1], [2, 2, 2], [30, 30, 30], [40, 40, 40]]
+	k = 4
+	train(data, k)
+
+if __name__ == '__main__':
+	main()

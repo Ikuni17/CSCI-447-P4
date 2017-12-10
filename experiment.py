@@ -6,7 +6,8 @@ December 9, 2017
 
 import ACO
 import pandas
-
+import matplotlib.pyplot as plt
+import numpy as np
 
 # Read in a csv dataset, convert all values to numbers, and return as a 2D list
 def get_dataset(csv_path):
@@ -27,6 +28,9 @@ def load_datasets():
 
     return datasets
 
+def gen_data():
+    return np.vstack(((np.random.randn(150, 2) * 0.75 + np.array([1, 0])), (np.random.randn(50, 2) * 0.25 + np.array([-0.5, 0.5])), (np.random.randn(50, 2) * 0.5 + np.array([-0.5, -0.5]))))
+
 
 def main():
     datasets = load_datasets()
@@ -38,6 +42,12 @@ def main():
         aco.main(name)
 
 
+def graph2dClusters(data):
+    for cluster in data:
+        xVal = [x[0] for x in cluster]
+        yVal = [y[1] for y in cluster]
+        plt.scatter(xVal, yVal, linestyle='None', marker = ".")
+    plt.show()
 
 if __name__ == '__main__':
     main()

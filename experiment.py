@@ -41,14 +41,17 @@ def main():
     csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
     datasets = load_datasets(csv_names)
 
-    '''for name in csv_names:
-        aco = ACO.ACO(data=datasets[name])
-        aco.main(name)'''
+    #for name in csv_names:
+    #aco = ACO.ACO(data=gen_data())
+    #aco.main('Random', max_iter=10000000)
+
+    pso = PSO(10, 2, gen_data())
+    pso.runSwarm(100)
 
     '''clusters = KM.train(gen_data(), 5)
     print(clusters)
-    graph2dClusters(clusters)'''
-    test_KM(datasets, csv_names)
+    graph2dClusters(clusters)
+    test_KM(datasets, csv_names)'''
 
 
 def test_KM(datasets, csv_names):
@@ -57,7 +60,7 @@ def test_KM(datasets, csv_names):
         results[name] = {2: 0, 3: 0, 4: 0, 5: 0}
         for k in range(2, 6):
             print("Starting test with k={0} on {1}".format(k, name))
-            for i in range(25):
+            for i in range(1000):
                 clusters = KM.train(datasets[name], k)
                 for key in clusters.keys():
                     if len(clusters[key]) == 0:

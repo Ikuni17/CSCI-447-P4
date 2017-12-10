@@ -13,6 +13,7 @@ import pandas
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 # Read in a csv dataset, convert all values to numbers, and return as a 2D list
 def get_dataset(csv_path):
     df = pandas.read_csv(csv_path, header=None)
@@ -22,7 +23,7 @@ def get_dataset(csv_path):
 def load_datasets():
     # Dataset names
     csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
-    #csv_names = ['machine']
+    # csv_names = ['machine']
     # Dictionary with dataset name as the key and a 2D list of vectors as the value
     datasets = {}
 
@@ -32,32 +33,50 @@ def load_datasets():
 
     return datasets
 
+
 def gen_data():
-    return np.vstack(((np.random.randn(150, 2) * 0.75 + np.array([1, 0])), (np.random.randn(50, 2) * 0.25 + np.array([-0.5, 0.5])), (np.random.randn(50, 2) * 0.5 + np.array([-0.5, -0.5]))))
+    return np.vstack(((np.random.randn(150, 2) * 0.75 + np.array([1, 0])),
+                      (np.random.randn(50, 2) * 0.25 + np.array([-0.5, 0.5])),
+                      (np.random.randn(50, 2) * 0.5 + np.array([-0.5, -0.5]))))
 
 
 def main():
     datasets = load_datasets()
     csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
-    #csv_names = ['airfoil', 'concrete', 'forestfires', 'yacht']
 
     '''for name in csv_names:
         aco = ACO.ACO(data=datasets[name])
         aco.main(name)'''
 
-    #clusters = KM.train(gen_data(), 3)
     clusters = KM.train(gen_data(), 3)
     print(clusters)
     graph2dClusters(clusters)
+    # test_KM(datasets, csv_names)
+
+
+def test_KM(datasets, csv_names):
+    results = {}
+    for name in csv_names:
+        results[name] = {2: 0, 3: 0, 4: 0, 5: 0}
+        for k in range(2, 6):
+            print("Starting test with k={0} on {1}".format(k, name))
+            for i in range(25):
+                clusters = KM.train(datasets[name], k)
+                for key in clusters.keys():
+                    if len(clusters[key]) == 0:
+                        results[name][k] += 1
+
+        print(results)
 
 
 def graph2dClusters(data):
     for cluster in data.values():
         xVal = [x[0] for x in cluster]
         yVal = [y[1] for y in cluster]
-        plt.scatter(xVal, yVal, linestyle='None', marker = ".")
+        plt.scatter(xVal, yVal, linestyle='None', marker=".")
 
     plt.show()
+
 
 if __name__ == '__main__':
     main()

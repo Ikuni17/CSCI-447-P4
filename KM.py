@@ -21,7 +21,7 @@ def calculate_centroids(clusters):
     for cluster_key in clusters.keys():
         centroids.append(calculate_centroid(clusters[cluster_key]))
 
-    print(centroids)
+    #print(centroids)
     return centroids
 
 
@@ -43,31 +43,32 @@ def associate_data(k, centers, data):
 
     # print(centers)
 
-    print("Starting Assoc:", len(centers))
+    #print("Starting Assoc:", len(centers))
     for point in data:
         min_index = None
         minimum = math.inf
 
         for center_index in range(len(centers)):
-            if len(centers[center_index]) == 0:
+            '''if len(centers[center_index]) == 0:
                 continue
-            else:
-                try:
-                    temp_distance = euclidian_distance(point, centers[center_index])
-                except(ValueError):
-                    print("Point:", point)
-                    print("Center:", centers[center_index])
-                    exit()
-                if temp_distance < minimum:
-                    minimum = temp_distance
-                    min_index = center_index
+            else:'''
+            try:
+                temp_distance = euclidian_distance(point, centers[center_index])
+            except(ValueError):
+                continue
+                '''print("Point:", point)
+                print("Center:", centers[center_index])
+                exit()'''
+            if temp_distance < minimum:
+                minimum = temp_distance
+                min_index = center_index
 
         '''if min_index not in clusters:
             clusters[min_index] = [point]
         else:'''
         clusters[min_index].append(point)
     # pprint.pprint(clusters)
-    print("End Assoc:", len(clusters.keys()))
+    #print("End Assoc:", len(clusters.keys()))
     return clusters
 
 
@@ -81,7 +82,7 @@ def print_vectors(title, input):
 def train(data, k):
     # select k initial centers randomly from data
     centers = select_random_vectors(k, data)
-    print("Starting Train:", len(centers))
+    #print("Starting Train:", len(centers))
     # print_vectors('Centers:', centers)
 
     old_centers_hash = hash(str([1]))
@@ -96,7 +97,7 @@ def train(data, k):
         old_centers = tuple(centers)
         # print_vectors('Centers:', centers)
 
-    print("End Train:", len(centers))
+    #print("End Train:", len(centers))
     return clusters
 
 

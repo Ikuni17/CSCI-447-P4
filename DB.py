@@ -1,5 +1,6 @@
 import CL
 import KM
+import experiment
 import pandas
 import copy
 import random
@@ -73,14 +74,12 @@ def get_neighbors(point, data, min_distance):
 			neighbors.append(i)
 	return neighbors
 
-
 def read_data(path):
 	df = pandas.read_csv(path, header=None)
 	return df.values.tolist()
 
-
 if __name__ == '__main__':
-	data = read_data('data/HTRU2/HTRU_2.csv')
+	data = read_data('datasets/machine.csv')
 	max_data_size = 6000
 	if len(data) > max_data_size:
 		new_data = []
@@ -88,12 +87,14 @@ if __name__ == '__main__':
 			new_data.append(data.pop(int(random.random() * len(data))))
 	sample_size = 5000
 	k = 4
-	min_distance = calc_distance_to_kth(new_data, sample_size, k)
-	# min_distance = 50
+	# min_distance = calc_distance_to_kth(data, sample_size, k)
+	min_distance = 197
 	# print(str(min_distance))
-	dbscan = DBScan(new_data, min_distance)
+	dbscan = DBScan(data, min_distance)
+	print('Average distance to center of cluster: {0}, number of clusters: {1}'.format(experiment.evaluate_clusters(dbscan), len(dbscan)))
+	experiment.graph2dClusters(dbscan)
 	# print(str(dbscan))
-	for i in dbscan:
-		print('cluster:')
-		for point in i:
-			print(point)
+	# for i in dbscan:
+	#	print('cluster:')
+	#	for point in i:
+	#		print(point)

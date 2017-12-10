@@ -131,6 +131,25 @@ def graph2dClusters(data):
 
     plt.show()
 
+def evaluate_clusters(clusters):
+    centers = []
+    average_dist = 0
+    num_points = 0
+    for cluster in clusters:
+        center_point = [0]*len(cluster[0])
+        num_points = num_points + len(cluster)
+
+        # Calculate the average in each dimension
+        for i in range(len(center_point)):
+            dimCut = [dim[i] for dim in cluster]
+            center_point[i] = sum(dimCut)/len(dimCut)
+        centers.append(center_point)
+
+        # Calcualte the distance from each point to its center
+        for point in cluster:
+            average_dist = average_dist + KM.euclidian_distance(point, center_point)
+
+    return average_dist/num_points
 
 if __name__ == '__main__':
     main()

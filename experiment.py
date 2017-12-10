@@ -12,6 +12,7 @@ import PSO
 import pandas
 import matplotlib.pyplot as plt
 import numpy as np
+import random
 
 
 # Read in a csv dataset, convert all values to numbers, and return as a 2D list
@@ -31,15 +32,71 @@ def load_datasets(csv_names):
     return datasets
 
 
-def gen_data():
-    return np.vstack(((np.random.randn(150, 2) * 0.75 + np.array([1, 0])),
-                      (np.random.randn(50, 2) * 0.25 + np.array([-0.5, 0.5])),
-                      (np.random.randn(50, 2) * 0.5 + np.array([-0.5, -0.5]))))
+def gen_data(mu, sigma, cluster_size, magnitude, dimension = 2):
+    if len(mu) != len(sigma):
+        print('invalid data generation parameters')
+    else:
+        data = []
+        for i in range(len(mu)):
+            # print('cluster')
+            cluster = np.ndarray.tolist(sigma[i] * np.random.randn(cluster_size, dimension) + mu[i] * magnitude)
+            # print(str(cluster))
+            for point in cluster:
+                data.append(point)
+        random.shuffle(data)
+        # KM.print_vectors('Data:', data)
+        df = pandas.DataFrame(data)
+        df.to_csv('data.csv', index=False)
+        return data
+
+
+def process_pairs(data):
+    x = []
+    y = []
+    for point in data:
+        x.append(point[0])
+        y.append(point[1])
+    return x, y
+
+
+def test_CL():
+    cluster_size = 1000
+    num_clusters = 4
+    epsilon_step = 1
+    magnitude = 10
+
+    # mu = []
+    # sigma = []
+    # for i in range(num_clusters):
+    #     mu.append(random.random())
+    #     sigma.append(random.random())
+    # data = gen_data(mu, sigma, cluster_size, magnitude)
+
+    data = get_dataset('data.csv')
+
+
+    clusters = CL.train(data, num_clusters, epsilon_step)
+    for key in clusters.keys():
+        x, y = process_pairs(clusters[key])
+        plt.scatter(x, y)
+
+    print(str(cluster_size) + '\n' + str(num_clusters) + '\n' + str(epsilon_step) + '\n' + str(magnitude))
+    plt.show()
 
 
 def main():
-    csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
-    datasets = load_datasets(csv_names)
+    test_CL()
+    # print(str(clusters))
+
+
+    # plt.scatter(x, y)
+    # plt.scatter(y, x)
+    # plt.show()
+
+
+
+    # csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
+    # datasets = load_datasets(csv_names)
 
     '''for name in csv_names:
         aco = ACO.ACO(data=datasets[name])
@@ -48,7 +105,7 @@ def main():
     '''clusters = KM.train(gen_data(), 5)
     print(clusters)
     graph2dClusters(clusters)'''
-    test_KM(datasets, csv_names)
+    # test_KM(datasets, csv_names)
 
 
 def test_KM(datasets, csv_names):

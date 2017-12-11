@@ -98,7 +98,46 @@ def dict_to_list(dict):
     return list
 
 
-# Main experiment that runs each algorithm on each dataset, then evaluate the resulting clusters
+# A reduced version of main() to create a submission video
+def video():
+    csv_names = ['cloud-small']
+    db_mins = [0.5]
+    datasets = load_datasets(csv_names)
+    num_clusters = 3
+    num_particles = 10
+
+    for i in range(len(csv_names)):
+        print("Starting PSO with:", csv_names[i])
+        pso = PSO.PSO(num_particles, num_clusters, datasets[csv_names[i]])
+        clusters = pso.runSwarm(100)
+        evaluate_clusters('PSO', csv_names[i], clusters)
+        graph2dClusters(clusters, 'PSO')
+
+        print("Starting ACO with:", csv_names[i])
+        aco = ACO.ACO(data=datasets[csv_names[i]])
+        clusters = dict_to_list(aco.main(csv_names[i], max_iter=100000))
+        evaluate_clusters('ACO', csv_names[i], clusters)
+        graph2dClusters(clusters, 'ACO-100k iterations')
+
+        print("Starting CL with:", csv_names[i])
+        clusters = dict_to_list(CL.train(datasets[csv_names[i]], num_clusters))
+        evaluate_clusters('CL', csv_names[i], clusters)
+        graph2dClusters(clusters, 'CL')
+
+        print("Starting DB with:", csv_names[i])
+        clusters = DB.DBScan(datasets[csv_names[i]], db_mins[i])
+        evaluate_clusters('DB', csv_names[i], clusters)
+        graph2dClusters(clusters, 'DB')
+
+        print("Starting KM with:", csv_names[i])
+        clusters, centers = KM.train(datasets[csv_names[i]], num_clusters)
+        clusters = dict_to_list(clusters)
+        evaluate_clusters('KM', csv_names[i], clusters)
+        graph2dClusters(clusters, 'KM')
+
+    # Main experiment that runs each algorithm on each dataset, then evaluate the resulting clusters
+
+
 def main():
     csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
     # Precomputed minimum for DBScan to save computations and user interaction
@@ -134,12 +173,13 @@ def main():
 
 
 # Helper method to graph clusters during tuning
-def graph2dClusters(data):
+def graph2dClusters(data, name):
     for cluster in data:
         xVal = [x[0] for x in cluster]
         yVal = [y[1] for y in cluster]
         plt.scatter(xVal, yVal, linestyle='None', marker=".")
         # plt.scatter(sum(xVal)/len(xVal), sum(yVal)/len(yVal))
+    plt.title(name)
     plt.show()
 
 
@@ -147,6 +187,8 @@ def graph2dClusters(data):
 the average points per cluster, the average distance between centers of the clusters, and number of clusters. Then
 writes the results to file.
 '''
+
+
 def evaluate_clusters(algorithm, dataset, clusters):
     # Each cluster is in a vector
     amount_clusters = len(clusters)
@@ -186,10 +228,10 @@ def evaluate_clusters(algorithm, dataset, clusters):
     center_dist /= (len(centers) * 2)
 
     # Append to the results file
-    with open('Results.txt', "a") as output:
+    with open('Results-Video.txt', "a") as output:
         output.write("{0},{1},{2},{3},{4},{5}\n".format(
             algorithm, dataset, amount_clusters, average_pts, average_dist, center_dist))
 
 
 if __name__ == '__main__':
-    main()
+    video()

@@ -1,3 +1,9 @@
+'''
+CSCI 447: Project 4
+Group 28: Trent Baker, Logan Bonney, Bradley White
+December 11, 2017
+'''
+
 import numpy as np
 import math
 import pandas
@@ -34,7 +40,7 @@ def calculate_centroid(cluster):
     # vector division to get the average value in each dimension
     cluster_avg = np.divide(cluster_avg, len(cluster))
 
-    #print(cluster_avg)
+    # print(cluster_avg)
     return cluster_avg
 
 
@@ -78,13 +84,17 @@ def train(data, k):
     # create a hash that will not be equal to hash(centers) to enter the while loop
     centers_hash = hash(str([1]))
 
+    i = 0
     # if the last iteration did something, keep going
     while hash(str(centers)) != centers_hash:
+        if i % 10 == 0:
+            print("KM, current iteration:", i)
         centers_hash = hash(str(centers))
 
         # associate the data with the nearest centroid and then calculate new centroids
         clusters = associate_data(k, centers, data)
         centers = calculate_centroids(clusters)
+        i += 1
     return clusters, centers
 
 
@@ -103,7 +113,7 @@ def read_data(path):
 
 def main():
     data = read_data('datasets/bean.csv')
-    k = 10
+    k = 3
     clusters, centers = train(data, k)
     for key in clusters.keys():
         x, y = experiment.process_pairs(clusters[key])

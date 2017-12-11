@@ -1,3 +1,9 @@
+'''
+CSCI 447: Project 4
+Group 28: Trent Baker, Logan Bonney, Bradley White
+December 9, 2017
+'''
+
 import random
 import numpy as np
 import KM
@@ -13,8 +19,8 @@ class Particle:
     def __init__(self, clusters, data):
         self.pbest = None
         self.pscore = None
-        self.centers_pos = [] # holds the centers as [[x1,y1],[x2,y2]]
-        self.velocity = [] # holds the current velocity as [[x1,y1],[x2,y2]]
+        self.centers_pos = []  # holds the centers as [[x1,y1],[x2,y2]]
+        self.velocity = []  # holds the current velocity as [[x1,y1],[x2,y2]]
 
         # Initialize random centers and velocity arrays
         for i in range(clusters):
@@ -35,8 +41,8 @@ class Particle:
 
                 # Calculate the average in each dimension for the cluster
                 for i in range(len(data[0])):
-                    dimCut = [dim[i] for dim in cluster] # Get all the values for a dimension in the cluster
-                    center_point.append(sum(dimCut) / len(dimCut)) # Calculate the average of that dimension
+                    dimCut = [dim[i] for dim in cluster]  # Get all the values for a dimension in the cluster
+                    center_point.append(sum(dimCut) / len(dimCut))  # Calculate the average of that dimension
                 centers.append(center_point)
 
             dist = 0

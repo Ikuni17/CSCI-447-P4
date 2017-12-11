@@ -1,7 +1,7 @@
 '''
 CSCI 447: Project 4
 Group 28: Trent Baker, Logan Bonney, Bradley White
-December 9, 2017
+December 11, 2017
 '''
 
 from collections import OrderedDict
@@ -271,7 +271,7 @@ class ACO():
     # Main ACO algorithm based on the Lumer-Faieta algorithm
     def main(self, name, max_iter=1000000):
         for i in range(max_iter):
-            if i % 100000 == 0:
+            if i % 10000 == 0:
                 print("ACO, current iteration:", i)
             # Iterate through all ants
             for ant in self.ants:

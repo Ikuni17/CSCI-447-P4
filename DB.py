@@ -1,3 +1,9 @@
+'''
+CSCI 447: Project 4
+Group 28: Trent Baker, Logan Bonney, Bradley White
+December 11, 2017
+'''
+
 import CL
 import KM
 import experiment
@@ -34,12 +40,12 @@ def DBScan(data, min_distance):
         if cluster:
             clusters.append(cluster)
 
+    print("DB, finished processing.")
     noise = []
     for i in range(len(labels)):
         if labels[i] == None:
             noise.append(data[i])
             labels[i] = cluster_id
-    #print(noise)
     cluster.append(noise)
     return clusters
 
@@ -80,9 +86,6 @@ def calc_distance_to_kth(data, sample_size, k):
 
     kth_distances = list(filter(lambda a: a != 0.0, kth_distances))
     kth_distances = list(filter(lambda a: a != None, kth_distances))
-    # for i in range(500):
-    # print(distances[i])
-    # return distances[k]
     kth_distances.sort()
     plt.plot(kth_distances)
     plt.show()
@@ -104,7 +107,7 @@ def read_data(path):
 
 
 if __name__ == '__main__':
-    data = read_data('datasets/concrete.csv')
+    data = read_data('datasets/cloud-small.csv')
     max_data_size = 6000
     if len(data) > max_data_size:
         new_data = []
@@ -113,15 +116,5 @@ if __name__ == '__main__':
     sample_size = 5000
     k = 4
     min_distance = calc_distance_to_kth(data, sample_size, k)
-    # min_distance = 197
-    # print(str(min_distance))
     dbscan = DBScan(data, min_distance)
-    experiment.evaluate_clusters('DB','airfoil',dbscan)
-    #print('Average distance to center of cluster: {0}, number of clusters: {1}'.format(
-    #    experiment.evaluate_clusters(dbscan), len(dbscan)))
-    #experiment.graph2dClusters(dbscan)
-# print(str(dbscan))
-# for i in dbscan:
-#	print('cluster:')
-#	for point in i:
-#		print(point)
+    experiment.evaluate_clusters('DB', 'concrete', dbscan)

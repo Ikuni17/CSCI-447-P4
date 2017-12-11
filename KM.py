@@ -1,27 +1,24 @@
 import numpy as np
-from copy import deepcopy
 import math
 import pandas
 import random
-import pprint
+
+import matplotlib.pyplot as plt
+import experiment
 
 
 def euclidian_distance(vector_a, vector_b):
+    # returns the euclidian distance between the two input vectors
     a = np.array(vector_a)
     b = np.array(vector_b)
-    # print(str(np.linalg.norm(a-b)))
-
     return np.linalg.norm(a - b)
 
 
 # takes a list of clusters, where a cluster is a list of data points
 def calculate_centroids(clusters):
     centroids = []
-
     for cluster_key in clusters.keys():
         centroids.append(calculate_centroid(clusters[cluster_key]))
-
-    #print(centroids)
     return centroids
 
 
@@ -32,8 +29,9 @@ def calculate_centroid(cluster):
     except(IndexError):
         return np.inf
     for point in cluster:
-        #print(str(point))
+        # vector addition of all data points to get the sum of each dimension
         cluster_avg = np.add(point, cluster_avg)
+    # vector division to get the average value in each dimension
     cluster_avg = np.divide(cluster_avg, len(cluster))
 
     #print(cluster_avg)
@@ -41,17 +39,17 @@ def calculate_centroid(cluster):
 
 
 def associate_data(k, centers, data):
+    # create the neccessary clusters
     clusters = {}
     for i in range(k):
         clusters[i] = []
 
-    # print(centers)
-
-    #print("Starting Assoc:", len(centers))
+    # for each data point, associate it with the cluster that has the nearest centroid
     for point in data:
         min_index = None
         minimum = math.inf
 
+        # find the centroid that is nearest to the current point
         for center_index in range(len(centers)):
             try:
                 temp_distance = euclidian_distance(point, centers[center_index])
@@ -61,9 +59,8 @@ def associate_data(k, centers, data):
                 minimum = temp_distance
                 min_index = center_index
 
+        # add the current point to the found nearest cluster
         clusters[min_index].append(point)
-    # pprint.pprint(clusters)
-    #print("End Assoc:", len(clusters.keys()))
     return clusters
 
 
@@ -77,44 +74,43 @@ def print_vectors(title, input):
 def train(data, k):
     # select k initial centers randomly from data
     centers = select_random_vectors(k, data)
-    #print("Starting Train:", len(centers))
-    # print_vectors('Centers:', centers)
 
-    old_centers_hash = hash(str([1]))
-    centers_hash = hash(str(centers))
-    while old_centers_hash != centers_hash:
-        old_centers_hash = hash(str(centers))
+    # create a hash that will not be equal to hash(centers) to enter the while loop
+    centers_hash = hash(str([1]))
 
+    # if the last iteration did something, keep going
+    while hash(str(centers)) != centers_hash:
+        centers_hash = hash(str(centers))
+
+        # associate the data with the nearest centroid and then calculate new centroids
         clusters = associate_data(k, centers, data)
         centers = calculate_centroids(clusters)
-
-        centers_hash = hash(str(centers))
-        old_centers = tuple(centers)
-        # print_vectors('Centers:', centers)
-
-    #print("End Train:", len(centers))
-    return clusters
+    return clusters, centers
 
 
+# randomly selects n vectors from data
 def select_random_vectors(n, data):
     output = []
     for i in range(n):
         output.append(data[int(random.random() * len(data))])
-
     return output
 
 
 def read_data(path):
     df = pandas.read_csv(path, header=None)
-
     return df.values.tolist()
 
 
 def main():
-    data = read_data('datasets/machine.csv')
-    # data = [[1, 1, 1], [2, 2, 2], [30, 30, 30], [40, 40, 40]]
-    k = 4
-    train(data, k)
+    data = read_data('datasets/bean.csv')
+    k = 10
+    clusters, centers = train(data, k)
+    for key in clusters.keys():
+        x, y = experiment.process_pairs(clusters[key])
+        plt.scatter(x, y, linestyle='None', marker=".")
+    x, y = experiment.process_pairs(centers)
+    plt.scatter(x, y, linestyle='None', marker=".", color='black')
+    plt.show()
 
 
 if __name__ == '__main__':

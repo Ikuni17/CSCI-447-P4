@@ -155,7 +155,7 @@ def graph2dClusters(data):
         xVal = [x[0] for x in cluster]
         yVal = [y[1] for y in cluster]
         plt.scatter(xVal, yVal, linestyle='None', marker=".")
-        plt.scatter(sum(xVal)/len(xVal), sum(yVal)/len(yVal))
+        # plt.scatter(sum(xVal)/len(xVal), sum(yVal)/len(yVal))
     plt.show()
 
 

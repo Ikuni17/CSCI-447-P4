@@ -85,8 +85,8 @@ class Particle:
 class PSO:
     def __init__(self, numParticles, clusters, data, v1=0.005, v2=0.01):
         # initialize the particles with random values
-        self.particles = self.initSwarm(numParticles, clusters, len(data[0]), v1, v2)
         self.data = data
+        self.particles = self.initSwarm(numParticles, clusters, len(data[0]), v1, v2)
 
     def runSwarm(self, rounds):
         for i in range(rounds):
@@ -102,7 +102,7 @@ class PSO:
         for i in range(numParticles):
             particles.append(Particle(clusters, variables))
             particles[i].pbest = particles[i].centers_pos
-            particles[i].pscore = particles[i].evaluate(data)
+            particles[i].pscore = particles[i].evaluate(self.data)
         Particle.gbest = particles[0].pbest
         Particle.gscore = particles[0].pscore
         Particle.v1 = v1
@@ -112,7 +112,7 @@ class PSO:
 
 if __name__ == '__main__':
     data_name = '3_clusters.csv'
-    iterations = 100
+    iterations = 10
     data = KM.read_data(data_name)
     clusters = 3
     particles = 10

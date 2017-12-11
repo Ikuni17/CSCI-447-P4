@@ -105,14 +105,13 @@ def main():
     # plt.scatter(y, x)
     # plt.show()
 
-    #csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
-    csv_names = ['forestfires', 'machine', 'yacht']
-    db_mins = [88, 2000, 3]
+    csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
+    db_mins = [9, 75, 88, 2000, 3]
     datasets = load_datasets(csv_names)
     num_clusters = 5
 
     for i in range(len(csv_names)):
-        print("Starting ACO with:", csv_names[i])
+        '''print("Starting ACO with:", csv_names[i])
         aco = ACO.ACO(data=datasets[csv_names[i]])
         clusters = dict_to_list(aco.main(csv_names[i], max_iter=1000000))
         evaluate_clusters('ACO', csv_names[i], clusters)
@@ -127,11 +126,12 @@ def main():
 
         print("Starting KM with:", csv_names[i])
         clusters = dict_to_list(KM.train(datasets[csv_names[i]], num_clusters))
-        evaluate_clusters('KM', csv_names[i], clusters)
-
-        '''print("Starting PSO with:", csv_names[i])
-        clusters = dict_to_list(KM.train(datasets[csv_names[i]], num_clusters))
         evaluate_clusters('KM', csv_names[i], clusters)'''
+
+        print("Starting PSO with:", csv_names[i])
+        pso = PSO.PSO(10, num_clusters, datasets[csv_names[i]])
+        clusters = pso.runSwarm(100)
+        evaluate_clusters('PSO', csv_names[i], clusters)
 
 
 # TODO Remove

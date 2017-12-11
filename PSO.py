@@ -121,5 +121,5 @@ if __name__ == '__main__':
                                                                                              particles, iterations))
     best = pso.runSwarm(iterations)
 
-    print(experiment.evaluate_clusters(best))
+    # print(experiment.evaluate_clusters(best))
     experiment.graph2dClusters(best)

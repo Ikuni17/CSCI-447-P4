@@ -39,7 +39,7 @@ def DBScan(data, min_distance):
         if labels[i] == None:
             noise.append(data[i])
             labels[i] = cluster_id
-    print(noise)
+    #print(noise)
     cluster.append(noise)
     return clusters
 
@@ -104,7 +104,7 @@ def read_data(path):
 
 
 if __name__ == '__main__':
-    data = read_data('datasets/machine.csv')
+    data = read_data('datasets/concrete.csv')
     max_data_size = 6000
     if len(data) > max_data_size:
         new_data = []

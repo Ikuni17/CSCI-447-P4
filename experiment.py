@@ -106,12 +106,12 @@ def main():
     # plt.show()
 
     csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
-    db_mins = [9, 90, 88, 2000, 3]
+    db_mins = [9, 75, 88, 2000, 3]
     datasets = load_datasets(csv_names)
     num_clusters = 5
 
     for i in range(len(csv_names)):
-        print("Starting ACO with:", csv_names[i])
+        '''print("Starting ACO with:", csv_names[i])
         aco = ACO.ACO(data=datasets[csv_names[i]])
         clusters = dict_to_list(aco.main(csv_names[i], max_iter=1000000))
         evaluate_clusters('ACO', csv_names[i], clusters)
@@ -126,7 +126,12 @@ def main():
 
         print("Starting KM with:", csv_names[i])
         clusters = dict_to_list(KM.train(datasets[csv_names[i]], num_clusters))
-        evaluate_clusters('KM', csv_names[i], clusters)
+        evaluate_clusters('KM', csv_names[i], clusters)'''
+
+        print("Starting PSO with:", csv_names[i])
+        pso = PSO.PSO(10, num_clusters, datasets[csv_names[i]])
+        clusters = pso.runSwarm(100)
+        evaluate_clusters('PSO', csv_names[i], clusters)
 
 
 # TODO Remove
@@ -154,7 +159,6 @@ def graph2dClusters(data):
     plt.show()
 
 
-# TODO Add metrics: Avg distance between centers
 def evaluate_clusters(algorithm, dataset, clusters):
     amount_clusters = len(clusters)
     centers = []
@@ -188,7 +192,7 @@ def evaluate_clusters(algorithm, dataset, clusters):
 
     with open('Results.txt', "a") as output:
         output.write(
-            "{0},{1},{2},{3},{4},{5},{6}".format(algorithm, dataset, amount_clusters, average_pts, average_dist,
+            "{0},{1},{2},{3},{4},{5},{6}\n".format(algorithm, dataset, amount_clusters, average_pts, average_dist,
                                                  center_dist, time.ctime(time.time())))
 
 

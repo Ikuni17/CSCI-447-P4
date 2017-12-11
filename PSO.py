@@ -83,7 +83,7 @@ class Particle:
 
 
 class PSO:
-    def __init__(self, numParticles, clusters, data, v1=0.01, v2=0.01):
+    def __init__(self, numParticles, clusters, data, v1=0.005, v2=0.01):
         # initialize the particles with random values
         self.particles = self.initSwarm(numParticles, clusters, len(data[0]), v1, v2)
         self.data = data

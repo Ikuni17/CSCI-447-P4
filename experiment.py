@@ -124,7 +124,7 @@ def test_KM(datasets, csv_names):
 
 
 def graph2dClusters(data):
-    for cluster in data.values():
+    for cluster in data:
         xVal = [x[0] for x in cluster]
         yVal = [y[1] for y in cluster]
         plt.scatter(xVal, yVal, linestyle='None', marker=".")
@@ -136,18 +136,19 @@ def evaluate_clusters(clusters):
     average_dist = 0
     num_points = 0
     for cluster in clusters:
-        center_point = [0]*len(cluster[0])
-        num_points = num_points + len(cluster)
+        if(cluster):
+            center_point = [0]*len(cluster[0])
+            num_points = num_points + len(cluster)
 
-        # Calculate the average in each dimension for the cluster
-        for i in range(len(center_point)):
-            dimCut = [dim[i] for dim in cluster]
-            center_point[i] = sum(dimCut)/len(dimCut)
-        centers.append(center_point)
+            # Calculate the average in each dimension for the cluster
+            for i in range(len(center_point)):
+                dimCut = [dim[i] for dim in cluster]
+                center_point[i] = sum(dimCut)/len(dimCut)
+            centers.append(center_point)
 
-        # Calcualte the distance from each point to its center
-        for point in cluster:
-            average_dist = average_dist + KM.euclidian_distance(point, center_point)
+            # Calcualte the distance from each point to its center
+            for point in cluster:
+                average_dist = average_dist + KM.euclidian_distance(point, center_point)
 
     return average_dist/num_points
 

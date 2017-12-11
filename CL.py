@@ -50,7 +50,7 @@ def compete(input, reference_vectors):
 	return min_index
 
 
-def train(data, num_clusters, epsilon_step =  0.001, epsilon = 1):
+def train(data, num_clusters, epsilon_step =  0.0001, epsilon = 1):
 	dimensions = len(data[0])
 	num_data_points = len(data)
 

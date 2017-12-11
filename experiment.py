@@ -60,27 +60,41 @@ def process_pairs(data):
 
 
 def test_CL():
-    cluster_size = 1000
-    num_clusters = 4
-    epsilon_step = 1
+    cluster_size = 10000
+    num_clusters = 5
+    epsilon_step = .0000001
     magnitude = 10
 
     # mu = []
     # sigma = []
     # for i in range(num_clusters):
-    #     mu.append(random.random())
-    #     sigma.append(random.random())
+    #     mu.append(random.random() * magnitude)
+    #     sigma.append(random.random() * magnitude)
     # data = gen_data(mu, sigma, cluster_size, magnitude)
+    # print('CL-[' + str(num_clusters) + ', ' + str(epsilon_step) + '].png')
 
-    data = get_dataset('data.csv')
+
+    path = 'bean'
+    data = get_dataset(path + '.csv')
+    print('CL-[' + str(num_clusters) + ', ' + str(epsilon_step) + ', ' + path + '].png')
 
     clusters = CL.train(data, num_clusters, epsilon_step)
     for key in clusters.keys():
         x, y = process_pairs(clusters[key])
-        plt.scatter(x, y)
+        plt.scatter(x, y, linestyle='None', marker=".")
 
     print(str(cluster_size) + '\n' + str(num_clusters) + '\n' + str(epsilon_step) + '\n' + str(magnitude))
+
+    print('evaluate result: ' + str(evaluate_clusters(dict_to_list(clusters))))
+    plt.title('CL: num_clusters = ' + str(num_clusters) + ', epsilon_step = ' + str(epsilon_step))
     plt.show()
+
+
+def dict_to_list(dict):
+    list = []
+    for key in dict.keys():
+        list.append(dict[key])
+    return list
 
 
 def main():

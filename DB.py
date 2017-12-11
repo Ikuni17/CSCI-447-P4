@@ -39,7 +39,7 @@ def DBScan(data, min_distance):
         if labels[i] == None:
             noise.append(data[i])
             labels[i] = cluster_id
-    print(noise)
+    #print(noise)
     cluster.append(noise)
     return clusters
 

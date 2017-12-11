@@ -104,7 +104,7 @@ def read_data(path):
 
 
 if __name__ == '__main__':
-    data = read_data('datasets/airfoil.csv')
+    data = read_data('datasets/machine.csv')
     max_data_size = 6000
     if len(data) > max_data_size:
         new_data = []

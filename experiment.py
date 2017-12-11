@@ -109,6 +109,7 @@ def main():
     db_mins = [9, 75, 88, 2000, 3]
     datasets = load_datasets(csv_names)
     num_clusters = 5
+    num_particles = 10
 
     for i in range(len(csv_names)):
         '''print("Starting ACO with:", csv_names[i])
@@ -129,7 +130,7 @@ def main():
         evaluate_clusters('KM', csv_names[i], clusters)'''
 
         print("Starting PSO with:", csv_names[i])
-        pso = PSO.PSO(10, num_clusters, datasets[csv_names[i]])
+        pso = PSO.PSO(num_particles, num_clusters, datasets[csv_names[i]])
         clusters = pso.runSwarm(100)
         evaluate_clusters('PSO', csv_names[i], clusters)
 
@@ -165,14 +166,14 @@ def evaluate_clusters(algorithm, dataset, clusters):
     average_dist = 0
     num_points = 0
     for cluster in clusters:
-        if(cluster):
-            center_point = [0]*len(cluster[0])
+        if (cluster):
+            center_point = [0] * len(cluster[0])
             num_points = num_points + len(cluster)
 
             # Calculate the average in each dimension for the cluster
             for i in range(len(center_point)):
                 dimCut = [dim[i] for dim in cluster]
-                center_point[i] = sum(dimCut)/len(dimCut)
+                center_point[i] = sum(dimCut) / len(dimCut)
             centers.append(center_point)
 
         # Calculate the distance from each point to its center
@@ -191,9 +192,8 @@ def evaluate_clusters(algorithm, dataset, clusters):
     center_dist /= len(centers)
 
     with open('Results.txt', "a") as output:
-        output.write(
-            "{0},{1},{2},{3},{4},{5},{6}\n".format(algorithm, dataset, amount_clusters, average_pts, average_dist,
-                                                 center_dist, time.ctime(time.time())))
+        output.write("{0},{1},{2},{3},{4},{5}\n".format(
+            algorithm, dataset, amount_clusters, average_pts, average_dist, center_dist))
 
 
 if __name__ == '__main__':

@@ -13,9 +13,10 @@ class Particle:
     def __init__(self, clusters, dimensions):
         self.pbest = None
         self.pscore = None
-        self.centers_pos = []
-        self.velocity = []
-        # Create an array for each center
+        self.centers_pos = [] # holds the centers as [[x1,y1],[x2,y2]]
+        self.velocity = [] # holds the current velocity as [[x1,y1],[x2,y2]]
+
+        # Initialize center and velocity arrays
         for i in range(clusters):
             self.centers_pos.append([])
             self.velocity.append([])

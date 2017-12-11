@@ -249,6 +249,7 @@ class ACO():
         cols = []
         for x in range(-threshold, threshold + 1):
             for y in range(-threshold, threshold + 1):
+                # Skip so we don't check the point against itself
                 if x == 0 and y == 0:
                     continue
                 else:
@@ -269,8 +270,8 @@ class ACO():
     # Main ACO algorithm based on the Lumer-Faieta algorithm
     def main(self, name, max_iter=1000000):
         for i in range(max_iter):
-            if i % 10000 == 0:
-                print("Current iteration:", i)
+            if i % 100000 == 0:
+                print("ACO, current iteration:", i)
             # Iterate through all ants
             for ant in self.ants:
                 # If the ant is not carrying anything and there is a datum available, try to pick it up
@@ -305,7 +306,7 @@ class ACO():
 
         # Find the clusters using helper functions
         clusters_points, clusters_real = self.find_clusters()
-        self.graph_grid(name, clusters_points)
+        #self.graph_grid(name, clusters_points)
         return clusters_real
 
 

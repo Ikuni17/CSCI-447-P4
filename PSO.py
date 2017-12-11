@@ -27,7 +27,25 @@ class Particle:
     # calculate the distance of the clusters and update gbest and pbest
     def evaluate(self, data):
         clusters = Particle.get_clusters(self.centers_pos, data)
-        performance = experiment.evaluate_clusters(clusters)
+        centers = []
+        average_dist = 0
+        num_points = 0
+        for cluster in clusters:
+            if (cluster):
+                center_point = [0] * len(cluster[0])
+                num_points = num_points + len(cluster)
+
+                # Calculate the average in each dimension for the cluster
+                for i in range(len(center_point)):
+                    dimCut = [dim[i] for dim in cluster]
+                    center_point[i] = sum(dimCut) / len(dimCut)
+                centers.append(center_point)
+
+            # Calculate the distance from each point to its center
+            for point in cluster:
+                average_dist = average_dist + KM.euclidian_distance(point, center_point)
+
+        performance = average_dist / num_points
         return performance
 
     def get_clusters(centers, data):
@@ -45,8 +63,10 @@ class Particle:
 
     def update_velocity(self):
         for i in range(len(self.velocity)):
-            for j  in range(len(self.velocity[i])):
-                self.velocity[i][j] = self.velocity[i][j] + Particle.v1 * random.uniform(0, 1) * (self.pbest[i][j] - self.centers_pos[i][j]) + Particle.v2 * random.uniform(0, 1) * (Particle.gbest[i][j] - self.centers_pos[i][j])
+            for j in range(len(self.velocity[i])):
+                self.velocity[i][j] = self.velocity[i][j] + Particle.v1 * random.uniform(0, 1) * (
+                        self.pbest[i][j] - self.centers_pos[i][j]) + Particle.v2 * random.uniform(0, 1) * (
+                                              Particle.gbest[i][j] - self.centers_pos[i][j])
 
     def move(self, data):
         self.update_velocity()
@@ -61,6 +81,7 @@ class Particle:
         elif performance < self.pscore:
             self.pbest = self.centers_pos
 
+
 class PSO:
     def __init__(self, numParticles, clusters, data, v1=0.005, v2=0.01):
         # initialize the particles with random values
@@ -69,6 +90,8 @@ class PSO:
 
     def runSwarm(self, rounds):
         for i in range(rounds):
+            if i % 10 == 0:
+                print("PSO, current iteration:", i)
             for particle in self.particles:
                 particle.move(self.data)
         print('calculaing clusters')
@@ -86,18 +109,20 @@ class PSO:
         Particle.v2 = v2
         return particles
 
+
 if __name__ == '__main__':
-    data_name= '3_clusters.csv'
+    data_name = '3_clusters.csv'
     iterations = 100
     data = KM.read_data(data_name)
     clusters = 3
     particles = 10
     pso = PSO(particles, clusters, data)
-    print('Running PSO on {0} with {1} clusters and {2} particles for {3} iterations'.format(data_name, clusters, particles, iterations))
+    print('Running PSO on {0} with {1} clusters and {2} particles for {3} iterations'.format(data_name, clusters,
+                                                                                             particles, iterations))
     best = pso.runSwarm(iterations)
     print(Particle.gbest)
     for cluster in best:
         print('cluster: {0}'.format(cluster))
 
-    print(experiment.evaluate_clusters(best))
-    experiment.graph2dClusters(best)
+    # print(experiment.evaluate_clusters(best))
+    # experiment.graph2dClusters(best)

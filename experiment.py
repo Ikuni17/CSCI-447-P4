@@ -13,6 +13,7 @@ import pandas
 import matplotlib.pyplot as plt
 import numpy as np
 import random
+import time
 
 
 # Read in a csv dataset, convert all values to numbers, and return as a 2D list
@@ -73,7 +74,6 @@ def test_CL():
     # data = gen_data(mu, sigma, cluster_size, magnitude)
     # print('CL-[' + str(num_clusters) + ', ' + str(epsilon_step) + '].png')
 
-
     path = 'bean'
     data = get_dataset(path + '.csv')
     print('CL-[' + str(num_clusters) + ', ' + str(epsilon_step) + ', ' + path + '].png')
@@ -106,22 +106,30 @@ def main():
     # plt.show()
 
     csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
+    db_mins = [9, 90, 88, 2000, 3]
     datasets = load_datasets(csv_names)
+    num_clusters = 5
 
-    for name in csv_names:
-        aco = ACO.ACO(data=datasets[name])
-        clusters = aco.main(name, max_iter=1000000)
-        print("{0} clusters: {1}".format(name, len(clusters.keys())))
-    # print(clusters)
+    for i in range(len(csv_names)):
+        print("Starting ACO with:", csv_names[i])
+        aco = ACO.ACO(data=datasets[csv_names[i]])
+        clusters = dict_to_list(aco.main(csv_names[i], max_iter=1000000))
+        evaluate_clusters('ACO', csv_names[i], clusters)
 
-    # graph2dClusters(clusters)
+        print("Starting CL with:", csv_names[i])
+        clusters = dict_to_list(CL.train(datasets[csv_names[i]], num_clusters))
+        evaluate_clusters('CL', csv_names[i], clusters)
 
-    '''clusters = KM.train(gen_data(), 5)
-    print(clusters)
-    graph2dClusters(clusters)'''
-    # test_KM(datasets, csv_names)
+        print("Starting DB with:", csv_names[i])
+        clusters = DB.DBScan(datasets[csv_names[i]], db_mins[i])
+        evaluate_clusters('DB', csv_names[i], clusters)
+
+        print("Starting KM with:", csv_names[i])
+        clusters = dict_to_list(KM.train(datasets[csv_names[i]], num_clusters))
+        evaluate_clusters('KM', csv_names[i], clusters)
 
 
+# TODO Remove
 def test_KM(datasets, csv_names):
     results = {}
     for name in csv_names:
@@ -146,7 +154,9 @@ def graph2dClusters(data):
     plt.show()
 
 
-def evaluate_clusters(clusters):
+# TODO Add metrics: Avg distance between centers
+def evaluate_clusters(algorithm, dataset, clusters):
+    amount_clusters = len(clusters)
     centers = []
     average_dist = 0
     num_points = 0
@@ -161,11 +171,25 @@ def evaluate_clusters(clusters):
                 center_point[i] = sum(dimCut)/len(dimCut)
             centers.append(center_point)
 
-            # Calcualte the distance from each point to its center
-            for point in cluster:
-                average_dist = average_dist + KM.euclidian_distance(point, center_point)
+        # Calculate the distance from each point to its center
+        for point in cluster:
+            average_dist = average_dist + KM.euclidian_distance(point, center_point)
 
-    return average_dist / num_points
+    average_dist = average_dist / num_points
+    average_pts = num_points / amount_clusters
+
+    center_dist = 0
+
+    for x in centers:
+        for y in centers:
+            center_dist += KM.euclidian_distance(x, y)
+
+    center_dist /= len(centers)
+
+    with open('Results.txt', "a") as output:
+        output.write(
+            "{0},{1},{2},{3},{4},{5},{6}".format(algorithm, dataset, amount_clusters, average_pts, average_dist,
+                                                 center_dist, time.ctime(time.time())))
 
 
 if __name__ == '__main__':

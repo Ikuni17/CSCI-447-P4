@@ -85,7 +85,7 @@ def train(data, k):
         # associate the data with the nearest centroid and then calculate new centroids
         clusters = associate_data(k, centers, data)
         centers = calculate_centroids(clusters)
-    return clusters
+    return clusters, centers
 
 
 # randomly selects n vectors from data
@@ -102,12 +102,14 @@ def read_data(path):
 
 
 def main():
-    data = read_data('datasets/3_clusters.csv')
-    k = 3
-    clusters = train(data, k)
+    data = read_data('datasets/bean.csv')
+    k = 10
+    clusters, centers = train(data, k)
     for key in clusters.keys():
         x, y = experiment.process_pairs(clusters[key])
         plt.scatter(x, y, linestyle='None', marker=".")
+    x, y = experiment.process_pairs(centers)
+    plt.scatter(x, y, linestyle='None', marker=".", color='black')
     plt.show()
 
 

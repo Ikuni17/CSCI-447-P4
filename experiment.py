@@ -13,7 +13,10 @@ import pandas
 import matplotlib.pyplot as plt
 import numpy as np
 import random
-import time
+
+''' This program runs each clustering algorithm on a specific dataset, and then evaluates the resulting clusters. Also,
+it has some auxiliary functions such as reading in datasets, graphing 2D data, and testing algorithms.
+'''
 
 
 # Read in a csv dataset, convert all values to numbers, and return as a 2D list
@@ -22,6 +25,7 @@ def get_dataset(csv_path):
     return df.values.tolist()
 
 
+# Create a dictionary of all datasets in csv_names
 def load_datasets(csv_names):
     # Dictionary with dataset name as the key and a 2D list of vectors as the value
     datasets = {}
@@ -33,24 +37,25 @@ def load_datasets(csv_names):
     return datasets
 
 
+# Generate random, clustered data for testing and output to csv
 def gen_data(mu, sigma, cluster_size, magnitude, dimension=2):
     if len(mu) != len(sigma):
-        print('invalid data generation parameters')
+        print('Invalid data generation parameters')
     else:
         data = []
         for i in range(len(mu)):
-            # print('cluster')
             cluster = np.ndarray.tolist(sigma[i] * np.random.randn(cluster_size, dimension) + mu[i] * magnitude)
-            # print(str(cluster))
             for point in cluster:
                 data.append(point)
+        # Shuffle the data so its not clustered already
         random.shuffle(data)
-        # KM.print_vectors('Data:', data)
+        # Write to CSV for later use if needed
         df = pandas.DataFrame(data)
         df.to_csv('data.csv', index=False)
         return data
 
 
+# Helper function to test CL
 def process_pairs(data):
     x = []
     y = []
@@ -60,24 +65,18 @@ def process_pairs(data):
     return x, y
 
 
+# Used to tune CL parameters
 def test_CL():
     cluster_size = 10000
     num_clusters = 5
     epsilon_step = .0000001
     magnitude = 10
 
-    # mu = []
-    # sigma = []
-    # for i in range(num_clusters):
-    #     mu.append(random.random() * magnitude)
-    #     sigma.append(random.random() * magnitude)
-    # data = gen_data(mu, sigma, cluster_size, magnitude)
-    # print('CL-[' + str(num_clusters) + ', ' + str(epsilon_step) + '].png')
-
-    path = 'bean'
-    data = get_dataset(path + '.csv')
+    path = 'datasets\\bean.csv'
+    data = get_dataset(path)
     print('CL-[' + str(num_clusters) + ', ' + str(epsilon_step) + ', ' + path + '].png')
 
+    # Run CL then graph the clusters
     clusters = CL.train(data, num_clusters, epsilon_step)
     for key in clusters.keys():
         x, y = process_pairs(clusters[key])
@@ -85,11 +84,13 @@ def test_CL():
 
     print(str(cluster_size) + '\n' + str(num_clusters) + '\n' + str(epsilon_step) + '\n' + str(magnitude))
 
-    print('evaluate result: ' + str(evaluate_clusters(dict_to_list(clusters))))
+    # Used old evaluate function
+    # print('evaluate result: ' + str(evaluate_clusters(dict_to_list(clusters))))
     plt.title('CL: num_clusters = ' + str(num_clusters) + ', epsilon_step = ' + str(epsilon_step))
     plt.show()
 
 
+# Converts a dictionary of clusters to a 2D matrix for analysis
 def dict_to_list(dict):
     list = []
     for key in dict.keys():
@@ -97,22 +98,19 @@ def dict_to_list(dict):
     return list
 
 
+# Main experiment that runs each algorithm on each dataset, then evaluate the resulting clusters
 def main():
-    # test_CL()
-    # print(str(clusters))
-
-    # plt.scatter(x, y)
-    # plt.scatter(y, x)
-    # plt.show()
-
     csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
+    # Precomputed minimum for DBScan to save computations and user interaction
     db_mins = [9, 75, 88, 2000, 3]
     datasets = load_datasets(csv_names)
+    # Number of clusters for CL, KM and PSO
     num_clusters = 5
+    # Number of particles for PSO
     num_particles = 10
 
     for i in range(len(csv_names)):
-        '''print("Starting ACO with:", csv_names[i])
+        print("Starting ACO with:", csv_names[i])
         aco = ACO.ACO(data=datasets[csv_names[i]])
         clusters = dict_to_list(aco.main(csv_names[i], max_iter=1000000))
         evaluate_clusters('ACO', csv_names[i], clusters)
@@ -127,7 +125,7 @@ def main():
 
         print("Starting KM with:", csv_names[i])
         clusters = dict_to_list(KM.train(datasets[csv_names[i]], num_clusters))
-        evaluate_clusters('KM', csv_names[i], clusters)'''
+        evaluate_clusters('KM', csv_names[i], clusters)
 
         print("Starting PSO with:", csv_names[i])
         pso = PSO.PSO(num_particles, num_clusters, datasets[csv_names[i]])
@@ -135,22 +133,7 @@ def main():
         evaluate_clusters('PSO', csv_names[i], clusters)
 
 
-# TODO Remove
-def test_KM(datasets, csv_names):
-    results = {}
-    for name in csv_names:
-        results[name] = {2: 0, 3: 0, 4: 0, 5: 0}
-        for k in range(2, 6):
-            print("Starting test with k={0} on {1}".format(k, name))
-            for i in range(25):
-                clusters = KM.train(datasets[name], k)
-                for key in clusters.keys():
-                    if len(clusters[key]) == 0:
-                        results[name][k] += 1
-
-    print(results)
-
-
+# Helper method to graph clusters during tuning
 def graph2dClusters(data):
     for cluster in data:
         xVal = [x[0] for x in cluster]
@@ -160,27 +143,37 @@ def graph2dClusters(data):
     plt.show()
 
 
+'''Analyze the clusters returned by an algorithm. Finds the average distance to the center for the points in a cluster,
+the average points per cluster, the average distance between centers of the clusters, and number of clusters. Then
+writes the results to file.
+'''
 def evaluate_clusters(algorithm, dataset, clusters):
+    # Each cluster is in a vector
     amount_clusters = len(clusters)
     centers = []
     average_dist = 0
     num_points = 0
-    for cluster in clusters:
-        if (cluster):
-            center_point = [0] * len(cluster[0])
-            num_points = num_points + len(cluster)
 
-            # Calculate the average in each dimension for the cluster
-            for i in range(len(center_point)):
-                dimCut = [dim[i] for dim in cluster]
-                center_point[i] = sum(dimCut) / len(dimCut)
-            centers.append(center_point)
+    # Iterate through all clusters
+    for cluster in clusters:
+        # Get the center and add to the sum of points
+        center_point = [0] * len(cluster[0])
+        num_points = num_points + len(cluster)
+
+        # Calculate the average in each dimension for the cluster
+        for i in range(len(center_point)):
+            dimCut = [dim[i] for dim in cluster]
+            center_point[i] = sum(dimCut) / len(dimCut)
+        # Add to the list of centers
+        centers.append(center_point)
 
         # Calculate the distance from each point to its center
         for point in cluster:
             average_dist = average_dist + KM.euclidian_distance(point, center_point)
 
+    # Get the average distance for all points to the center, represents how tight clusters are
     average_dist = average_dist / num_points
+    # Get the average points per cluster
     average_pts = num_points / amount_clusters
 
     center_dist = 0
@@ -189,8 +182,10 @@ def evaluate_clusters(algorithm, dataset, clusters):
         for y in centers:
             center_dist += KM.euclidian_distance(x, y)
 
-    center_dist /= len(centers)
+    # Add a factor of 2 since each distance is found twice
+    center_dist /= (len(centers) * 2)
 
+    # Append to the results file
     with open('Results.txt', "a") as output:
         output.write("{0},{1},{2},{3},{4},{5}\n".format(
             algorithm, dataset, amount_clusters, average_pts, average_dist, center_dist))

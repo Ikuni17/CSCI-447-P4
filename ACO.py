@@ -177,7 +177,8 @@ class ACO():
             plt.scatter(x, y)
 
         # Create a legend of cluster number and color
-        plt.legend(clusters.keys())
+        plt.title('Clustering on {0}'.format(name))
+        plt.legend()
         plt.grid()
         plt.savefig('tuning\\ACO\\ACO-{2}, {0}-1M, 10%, {1}, C.png'.format(str(self.gammas), self.patch_size, name))
         # plt.show()
@@ -306,7 +307,7 @@ class ACO():
 
         # Find the clusters using helper functions
         clusters_points, clusters_real = self.find_clusters()
-        #self.graph_grid(name, clusters_points)
+        self.graph_grid(name, clusters_points)
         return clusters_real
 
 

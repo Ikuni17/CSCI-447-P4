@@ -192,7 +192,7 @@ def evaluate_clusters(algorithm, dataset, clusters):
     center_dist /= len(centers)
 
     with open('Results.txt', "a") as output:
-        output.write("{0},{1},{2},{3},{4},{5},{6}\n".format(
+        output.write("{0},{1},{2},{3},{4},{5}\n".format(
             algorithm, dataset, amount_clusters, average_pts, average_dist, center_dist))
 
 

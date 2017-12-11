@@ -7,6 +7,7 @@ December 9, 2017
 from collections import OrderedDict
 import math
 from matplotlib import pyplot as plt
+import numpy as np
 import random
 
 
@@ -47,7 +48,7 @@ class ACO():
         # Create twice as many ants as data points
         self.ants = self.init_ants(int(length / 10))
         # The search space of the ants
-        #self.patch_size = math.ceil(length * 0.024) 5
+        # self.patch_size = math.ceil(length * 0.024) 5
         self.patch_size = patch_size
         # The amount of spaces an ant can move per move
         self.step_size = step_size
@@ -138,39 +139,6 @@ class ACO():
         else:
             return 1
 
-    def eval_clusters(self, name):
-        datum_x = []
-        datum_y = []
-        ant_x = []
-        ant_y = []
-        both_x = []
-        both_y = []
-        colors = ['yellow', 'gray', 'pink', 'orange', 'black', 'blue', 'red', 'green', 'purple']
-
-        for k, v in self.grid.items():
-            # if v['Datum'] is not None and v['Ant'] is None:
-            if v['Datum'] is not None:
-                datum_x.append(k[0])
-                datum_y.append(k[1])
-            '''elif v['Datum'] is None and v['Ant'] is not None:
-                ant_x.append(k[0])
-                ant_y.append(k[1])
-            elif v['Datum'] is not None and v['Ant'] is not None:
-                both_x.append(k[0])
-                both_y.append(k[1])'''
-
-        # print("Plotting:", len(datum_x))
-        plt.figure(figsize=(25.5, 13.5), dpi=100)
-        plt.scatter(datum_x, datum_y, c=colors[5], label='Data')
-        # plt.scatter(ant_x, ant_y, c=colors[6], label='Ants')
-        # plt.scatter(both_x, both_y, c=colors[4], label='Both')
-        plt.legend()
-        plt.grid()
-        plt.title(
-            "ACO: $\gamma={0}, \gamma_1={1}, \gamma_2={2}$".format(self.gammas[0], self.gammas[1], self.gammas[2]))
-        plt.savefig('tuning\\ACO\\ACO-{2}, {0}-1M, 10%, {1}.png'.format(str(self.gammas), self.patch_size, name))
-        # plt.show()
-
     # Find a valid position for an ant to move to within step size
     def find_valid_pos(self, ant):
         # Only try positions which
@@ -194,6 +162,109 @@ class ACO():
             return ant.location
         else:
             return rand_pos
+
+    # Graphs the points in the 2D grid which currently have a datum
+    def graph_grid(self, name, clusters):
+        # Use a different color for each cluster
+        colors = np.random.rand(len(clusters.keys()))
+
+        # Make a large graph
+        plt.figure(figsize=(25.5, 13.5), dpi=100)
+        # Iterate through each cluster and add it to the scatterplot
+        for cluster in clusters.values():
+            x = [x[0] for x in cluster]
+            y = [y[1] for y in cluster]
+            plt.scatter(x, y)
+
+        # Create a legend of cluster number and color
+        plt.legend(clusters.keys())
+        plt.grid()
+        plt.savefig('tuning\\ACO\\ACO-{2}, {0}-1M, 10%, {1}, C.png'.format(str(self.gammas), self.patch_size, name))
+        # plt.show()
+
+    # Search for clusters in the grid, based on depth first search and an area around each point that has datum
+    def find_clusters(self):
+        # Get the points (x, y) from the grid which are considered a cluster
+        clusters_points = self.connect_points()
+        clusters_real = {}
+        # Make clusters which contain the real values for comparison to other algorithms
+        for key in clusters_points.keys():
+            clusters_real[key] = []
+            for point in clusters_points[key]:
+                # Get the datum vector from the grid which corresponds to this point
+                clusters_real[key].append(self.grid[(point[0], point[1])]['Datum'])
+
+        # Return both views of the cluster
+        return clusters_points, clusters_real
+
+    # Use DFS to find all points which are connected and therefore clustered
+    def connect_points(self):
+        # Mark each point as unvisited
+        visited = [[False for j in range(self.grid_size + 1)] for i in range(self.grid_size + 1)]
+        # Keep track of the amount of clusters, used as a dictionary key and identifier
+        count = 0
+        # Has the structure {id: [(x1, y1), (x2, y2), ...]
+        clusters = {}
+        # Check every point in the grid
+        for i in range(self.grid_size + 1):
+            for j in range(self.grid_size + 1):
+                # If the point has not been visited and there is a datum, this is a new cluster
+                if visited[i][j] is False and self.grid[(i, j)]['Datum'] is not None:
+                    # Add a new cluster to the dictionary
+                    clusters[count] = []
+                    # Start the recursion by calling helper
+                    self.DFS(i, j, visited, clusters[count])
+                    # Move to the next cluster
+                    count += 1
+
+        # List of clusters to remove from the dictionary because they are empty lists
+        remove = []
+
+        # Find empty lists in the dictionary, but wait to remove or runtime errors will occur
+        for k, v in clusters.items():
+            if len(v) == 0:
+                remove.append(k)
+
+        # Remove from the dictionary
+        for k in remove:
+            del clusters[k]
+
+        return clusters
+
+    # Determine if a point is valid, used by DFS. Valid signifies that it is on the grid, not visited and is holding a
+    # datum vector
+    def is_valid(self, i, j, visited):
+        return 0 <= i < self.grid_size + 1 and 0 <= j < self.grid_size + 1 and not visited[i][j] and \
+               self.grid[(i, j)]['Datum'] is not None
+
+    # Recursive DFS algorithm
+    def DFS(self, i, j, visited, cluster):
+        # The square search space around a point which can be valid for connection. 2 would mean two points left,
+        # two right, two down, etc and is generally safe and close to what shows within a graph.
+        # 1 creates many small clusters
+        threshold = 2
+
+        # Create vectors of valid x, y coordinates which are around the point we're at
+        rows = []
+        cols = []
+        for x in range(-threshold, threshold + 1):
+            for y in range(-threshold, threshold + 1):
+                if x == 0 and y == 0:
+                    continue
+                else:
+                    rows.append(x)
+                    cols.append(y)
+
+        # Set the current point to visited
+        visited[i][j] = True
+
+        # Iterate through all reachable points
+        for z in range(len(rows)):
+            # Determine if the point is valid
+            if self.is_valid(i + rows[z], j + cols[z], visited):
+                # Append the location to the cluster list, and recure from it
+                cluster.append((i + rows[z], j + cols[z]))
+                self.DFS(i + rows[z], j + cols[z], visited, cluster)
 
     # Main ACO algorithm based on the Lumer-Faieta algorithm
     def main(self, name, max_iter=1000000):
@@ -232,7 +303,10 @@ class ACO():
                 self.grid[rand_pos]['Ant'] = ant
                 ant.location = rand_pos
 
-        self.eval_clusters(name)
+        # Find the clusters using helper functions
+        clusters_points, clusters_real = self.find_clusters()
+        self.graph_grid(name, clusters_points)
+        return clusters_real
 
 
 if __name__ == '__main__':

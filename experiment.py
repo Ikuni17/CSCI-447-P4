@@ -32,7 +32,7 @@ def load_datasets(csv_names):
     return datasets
 
 
-def gen_data(mu, sigma, cluster_size, magnitude, dimension = 2):
+def gen_data(mu, sigma, cluster_size, magnitude, dimension=2):
     if len(mu) != len(sigma):
         print('invalid data generation parameters')
     else:
@@ -74,7 +74,6 @@ def test_CL():
 
     data = get_dataset('data.csv')
 
-
     clusters = CL.train(data, num_clusters, epsilon_step)
     for key in clusters.keys():
         x, y = process_pairs(clusters[key])
@@ -85,22 +84,23 @@ def test_CL():
 
 
 def main():
-    test_CL()
+    # test_CL()
     # print(str(clusters))
-
 
     # plt.scatter(x, y)
     # plt.scatter(y, x)
     # plt.show()
 
+    csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
+    datasets = load_datasets(csv_names)
 
-
-    # csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
-    # datasets = load_datasets(csv_names)
-
-    '''for name in csv_names:
+    for name in csv_names:
         aco = ACO.ACO(data=datasets[name])
-        aco.main(name)'''
+        clusters = aco.main(name, max_iter=1000000)
+        print("{0} clusters: {1}".format(name, len(clusters.keys())))
+    # print(clusters)
+
+    # graph2dClusters(clusters)
 
     '''clusters = KM.train(gen_data(), 5)
     print(clusters)
@@ -131,25 +131,27 @@ def graph2dClusters(data):
 
     plt.show()
 
+
 def evaluate_clusters(clusters):
     centers = []
     average_dist = 0
     num_points = 0
     for cluster in clusters:
-        center_point = [0]*len(cluster[0])
+        center_point = [0] * len(cluster[0])
         num_points = num_points + len(cluster)
 
         # Calculate the average in each dimension
         for i in range(len(center_point)):
             dimCut = [dim[i] for dim in cluster]
-            center_point[i] = sum(dimCut)/len(dimCut)
+            center_point[i] = sum(dimCut) / len(dimCut)
         centers.append(center_point)
 
         # Calcualte the distance from each point to its center
         for point in cluster:
             average_dist = average_dist + KM.euclidian_distance(point, center_point)
 
-    return average_dist/num_points
+    return average_dist / num_points
+
 
 if __name__ == '__main__':
     main()

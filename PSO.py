@@ -20,7 +20,7 @@ class Particle:
             self.centers_pos.append([])
             self.velocity.append([])
             for j in range(dimensions):
-                self.centers_pos[i].append(random.uniform(0, 10))
+                self.centers_pos[i].append(10*random.random())
                 self.velocity[i].append(0)
         self.centers_pos = self.centers_pos
 
@@ -56,7 +56,7 @@ class Particle:
         for point in data:
             closest = 0
             for i in range(len(centers)):
-                if KM.euclidian_distance(centers[i], point) < KM.euclidian_distance(centers[closest], point):
+                if abs(KM.euclidian_distance(centers[i], point)) < abs(KM.euclidian_distance(centers[closest], point)):
                     closest = i
             clusters[closest].append(point)
         return clusters
@@ -64,8 +64,8 @@ class Particle:
     def update_velocity(self):
         for i in range(len(self.velocity)):
             for j in range(len(self.velocity[i])):
-                self.velocity[i][j] = self.velocity[i][j] + Particle.v1 * random.uniform(0, 1) * (
-                        self.pbest[i][j] - self.centers_pos[i][j]) + Particle.v2 * random.uniform(0, 1) * (
+                self.velocity[i][j] = self.velocity[i][j] + Particle.v1 * random.random() * (
+                        self.pbest[i][j] - self.centers_pos[i][j]) + Particle.v2 * random.random() * (
                                               Particle.gbest[i][j] - self.centers_pos[i][j])
 
     def move(self, data):
@@ -115,14 +115,11 @@ if __name__ == '__main__':
     iterations = 10
     data = KM.read_data(data_name)
     clusters = 3
-    particles = 10
+    particles = 100
     pso = PSO(particles, clusters, data)
     print('Running PSO on {0} with {1} clusters and {2} particles for {3} iterations'.format(data_name, clusters,
                                                                                              particles, iterations))
     best = pso.runSwarm(iterations)
-    print(Particle.gbest)
-    for cluster in best:
-        print('cluster: {0}'.format(cluster))
 
     # print(experiment.evaluate_clusters(best))
-    # experiment.graph2dClusters(best)
+    experiment.graph2dClusters(best)

@@ -10,38 +10,38 @@ min_neighbors = 4
 
 
 def DBScan(data, min_distance):
-	labels = [None] * len(data)
-	clusters = []
-	cluster_id = 0
-	for point in range(len(data)):
-		cluster = []
-		points_to_process = [point]
-		while points_to_process:
-			current_point = points_to_process.pop(0)
-			neighbors = get_neighbors(data[current_point], data, min_distance)
-			if labels[current_point] == None:
-				if len(neighbors) > 4:
-					labels[current_point] = cluster_id
-					cluster.append(data[current_point])
-					points_to_process = points_to_process + neighbors
-				elif len(neighbors) > 0:
-					for neighbor in neighbors:
-						if labels[neighbor] != None and labels[neighbor] == cluster_id:
-							labels[current_point] = cluster_id
-							cluster.append(data[current_point])
+    labels = [None] * len(data)
+    clusters = []
+    cluster_id = 0
+    for point in range(len(data)):
+        cluster = []
+        points_to_process = [point]
+        while points_to_process:
+            current_point = points_to_process.pop(0)
+            neighbors = get_neighbors(data[current_point], data, min_distance)
+            if labels[current_point] == None:
+                if len(neighbors) > 4:
+                    labels[current_point] = cluster_id
+                    cluster.append(data[current_point])
+                    points_to_process = points_to_process + neighbors
+                elif len(neighbors) > 0:
+                    for neighbor in neighbors:
+                        if labels[neighbor] != None and labels[neighbor] == cluster_id:
+                            labels[current_point] = cluster_id
+                            cluster.append(data[current_point])
 
-			cluster_id += 1
-		if cluster:
-			clusters.append(cluster)
+            cluster_id += 1
+        if cluster:
+            clusters.append(cluster)
 
-	noise = []
-	for i in range(len(labels)):
-		if labels[i] == None:
-			noise.append(data[i])
-			labels[i] = cluster_id
-	print(noise)
-	cluster.append(noise)
-	return clusters
+    noise = []
+    for i in range(len(labels)):
+        if labels[i] == None:
+            noise.append(data[i])
+            labels[i] = cluster_id
+    print(noise)
+    cluster.append(noise)
+    return clusters
 
 
 def expand_cluster(point, data, labels, min_distance, cluster_id, cluster):
@@ -87,7 +87,7 @@ def calc_distance_to_kth(data, sample_size, k):
     plt.plot(kth_distances)
     plt.show()
 
-	return float(input('Please enter the y value where exponential increase begins: '))
+    return float(input('Please enter the y value where exponential increase begins: '))
 
 
 def get_neighbors(point, data, min_distance):
@@ -104,22 +104,24 @@ def read_data(path):
 
 
 if __name__ == '__main__':
-	data = read_data('3_clusters.csv')
-	max_data_size = 6000
-	if len(data) > max_data_size:
-		new_data = []
-		for i in range(max_data_size):
-			new_data.append(data.pop(int(random.random() * len(data))))
-	sample_size = 5000
-	k = 4
-	min_distance = calc_distance_to_kth(data, sample_size, k)
-	# min_distance = 197
-	# print(str(min_distance))
-	dbscan = DBScan(data, min_distance)
-	print('Average distance to center of cluster: {0}, number of clusters: {1}'.format(experiment.evaluate_clusters(dbscan), len(dbscan)))
-	experiment.graph2dClusters(dbscan)
-	# print(str(dbscan))
-	# for i in dbscan:
-	#	print('cluster:')
-	#	for point in i:
-	#		print(point)
+    data = read_data('datasets/airfoil.csv')
+    max_data_size = 6000
+    if len(data) > max_data_size:
+        new_data = []
+        for i in range(max_data_size):
+            new_data.append(data.pop(int(random.random() * len(data))))
+    sample_size = 5000
+    k = 4
+    min_distance = calc_distance_to_kth(data, sample_size, k)
+    # min_distance = 197
+    # print(str(min_distance))
+    dbscan = DBScan(data, min_distance)
+    experiment.evaluate_clusters('DB','airfoil',dbscan)
+    #print('Average distance to center of cluster: {0}, number of clusters: {1}'.format(
+    #    experiment.evaluate_clusters(dbscan), len(dbscan)))
+    #experiment.graph2dClusters(dbscan)
+# print(str(dbscan))
+# for i in dbscan:
+#	print('cluster:')
+#	for point in i:
+#		print(point)

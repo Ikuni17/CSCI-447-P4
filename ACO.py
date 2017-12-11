@@ -271,7 +271,7 @@ class ACO():
     def main(self, name, max_iter=1000000):
         for i in range(max_iter):
             if i % 100000 == 0:
-                print("Current iteration:", i)
+                print("ACO, current iteration:", i)
             # Iterate through all ants
             for ant in self.ants:
                 # If the ant is not carrying anything and there is a datum available, try to pick it up

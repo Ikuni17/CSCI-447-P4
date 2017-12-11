@@ -10,72 +10,83 @@ class Particle:
     v1 = None
     v2 = None
 
-    def __init__(self, clusters, dimensions):
+    def __init__(self, clusters, data):
         self.pbest = None
         self.pscore = None
         self.centers_pos = [] # holds the centers as [[x1,y1],[x2,y2]]
         self.velocity = [] # holds the current velocity as [[x1,y1],[x2,y2]]
 
-        # Initialize center and velocity arrays
+        # Initialize random centers and velocity arrays
         for i in range(clusters):
-            self.centers_pos.append([])
+            self.centers_pos.append(list(data[random.randint(0, len(data) - 1)]))
             self.velocity.append([])
-            for j in range(dimensions):
-                self.centers_pos[i].append(10*random.random())
+            for j in range(len(data[0])):
                 self.velocity[i].append(0)
         self.centers_pos = self.centers_pos
 
-    # calculate the distance of the clusters and update gbest and pbest
+    # calculates the average distance to center for each cluster
     def evaluate(self, data):
+        # calculates lists of clustered points based on the centers
         clusters = Particle.get_clusters(self.centers_pos, data)
         centers = []
-        average_dist = 0
-        num_points = 0
         for cluster in clusters:
             if (cluster):
-                center_point = [0] * len(cluster[0])
-                num_points = num_points + len(cluster)
+                center_point = []
 
                 # Calculate the average in each dimension for the cluster
-                for i in range(len(center_point)):
-                    dimCut = [dim[i] for dim in cluster]
-                    center_point[i] = sum(dimCut) / len(dimCut)
+                for i in range(len(data[0])):
+                    dimCut = [dim[i] for dim in cluster] # Get all the values for a dimension in the cluster
+                    center_point.append(sum(dimCut) / len(dimCut)) # Calculate the average of that dimension
                 centers.append(center_point)
 
+            dist = 0
             # Calculate the distance from each point to its center
             for point in cluster:
-                average_dist = average_dist + KM.euclidian_distance(point, center_point)
+                dist = dist + KM.euclidian_distance(point, center_point)
 
-        performance = average_dist / num_points
-        return performance
+        average = dist / len(data)
+        return average
 
+    # Find the closest center for a point and assign it to that cluster
     def get_clusters(centers, data):
+        # Initialize clusters with the right length
         clusters = []
         for i in range(len(centers)):
             clusters.append([])
 
+        # Find each points closest center
         for point in data:
             closest = 0
             for i in range(len(centers)):
                 if abs(KM.euclidian_distance(centers[i], point)) < abs(KM.euclidian_distance(centers[closest], point)):
                     closest = i
+            # Assign it to a point
             clusters[closest].append(point)
         return clusters
 
     def update_velocity(self):
+        # For every center's velocity
         for i in range(len(self.velocity)):
+            # For every dimension in the data
             for j in range(len(self.velocity[i])):
+                # Calculate the new velocity based on the update rule
                 self.velocity[i][j] = self.velocity[i][j] + Particle.v1 * random.random() * (
                         self.pbest[i][j] - self.centers_pos[i][j]) + Particle.v2 * random.random() * (
                                               Particle.gbest[i][j] - self.centers_pos[i][j])
 
     def move(self, data):
         self.update_velocity()
+
+        # For evey center
         for i in range(len(self.centers_pos)):
+            # For every dimension
             for j in range(len(self.centers_pos[i])):
+                # upadate the position
                 self.centers_pos[i][j] = self.centers_pos[i][j] + self.velocity[i][j]
+        # Evaluate the position
         performance = self.evaluate(data)
-        # update personal and global bests if we found a better position
+
+        # update personal and/or global bests if we found a better position
         if performance < Particle.gscore:
             Particle.gbest = self.centers_pos
             self.pbest = self.centers_pos
@@ -84,11 +95,12 @@ class Particle:
 
 
 class PSO:
-    def __init__(self, numParticles, clusters, data, v1=0.005, v2=0.01):
+    def __init__(self, numParticles, clusters, data, v1=0.01, v2=0.01):
         # initialize the particles with random values
         self.data = data
-        self.particles = self.initSwarm(numParticles, clusters, len(data[0]), v1, v2)
+        self.particles = self.initSwarm(numParticles, clusters, data, v1, v2)
 
+    # Move each particle around for the number of rounds and return the clusters as lists
     def runSwarm(self, rounds):
         for i in range(rounds):
             if i % 10 == 0:
@@ -98,6 +110,7 @@ class PSO:
         print('calculaing clusters')
         return Particle.get_clusters(Particle.gbest, self.data)
 
+    # Initialize particles and return them as a list
     def initSwarm(self, numParticles, clusters, variables, v1, v2):
         particles = []
         for i in range(numParticles):
@@ -112,11 +125,11 @@ class PSO:
 
 
 if __name__ == '__main__':
-    data_name = '3_clusters.csv'
-    iterations = 10
+    data_name = 'datasets/bean.csv'
+    iterations = 100
     data = KM.read_data(data_name)
-    clusters = 3
-    particles = 100
+    clusters = 5
+    particles = 10
     pso = PSO(particles, clusters, data)
     print('Running PSO on {0} with {1} clusters and {2} particles for {3} iterations'.format(data_name, clusters,
                                                                                              particles, iterations))

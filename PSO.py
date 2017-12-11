@@ -57,9 +57,9 @@ class Particle:
         # update personal and global bests if we found a better position
         if performance < Particle.gscore:
             Particle.gbest = self.centers_pos
-            Particle.pbest = self.centers_pos
+            self.pbest = self.centers_pos
         elif performance < self.pscore:
-            Particle.pbest = self.centers_pos
+            self.pbest = self.centers_pos
 
 class PSO:
     def __init__(self, numParticles, clusters, data, v1=0.01, v2=0.01):
@@ -88,7 +88,7 @@ class PSO:
 
 if __name__ == '__main__':
     data_name= '3_clusters.csv'
-    iterations = 10
+    iterations = 100
     data = KM.read_data(data_name)
     clusters = 3
     particles = 10

@@ -32,7 +32,7 @@ def load_datasets(csv_names):
     return datasets
 
 
-def gen_data(mu, sigma, cluster_size, magnitude, dimension = 2):
+def gen_data(mu, sigma, cluster_size, magnitude, dimension=2):
     if len(mu) != len(sigma):
         print('invalid data generation parameters')
     else:
@@ -60,47 +60,61 @@ def process_pairs(data):
 
 
 def test_CL():
-    cluster_size = 1000
-    num_clusters = 4
-    epsilon_step = 1
+    cluster_size = 10000
+    num_clusters = 5
+    epsilon_step = .0000001
     magnitude = 10
 
     # mu = []
     # sigma = []
     # for i in range(num_clusters):
-    #     mu.append(random.random())
-    #     sigma.append(random.random())
+    #     mu.append(random.random() * magnitude)
+    #     sigma.append(random.random() * magnitude)
     # data = gen_data(mu, sigma, cluster_size, magnitude)
+    # print('CL-[' + str(num_clusters) + ', ' + str(epsilon_step) + '].png')
 
-    data = get_dataset('data.csv')
 
+    path = 'bean'
+    data = get_dataset(path + '.csv')
+    print('CL-[' + str(num_clusters) + ', ' + str(epsilon_step) + ', ' + path + '].png')
 
     clusters = CL.train(data, num_clusters, epsilon_step)
     for key in clusters.keys():
         x, y = process_pairs(clusters[key])
-        plt.scatter(x, y)
+        plt.scatter(x, y, linestyle='None', marker=".")
 
     print(str(cluster_size) + '\n' + str(num_clusters) + '\n' + str(epsilon_step) + '\n' + str(magnitude))
+
+    print('evaluate result: ' + str(evaluate_clusters(dict_to_list(clusters))))
+    plt.title('CL: num_clusters = ' + str(num_clusters) + ', epsilon_step = ' + str(epsilon_step))
     plt.show()
 
 
-def main():
-    test_CL()
-    # print(str(clusters))
+def dict_to_list(dict):
+    list = []
+    for key in dict.keys():
+        list.append(dict[key])
+    return list
 
+
+def main():
+    # test_CL()
+    # print(str(clusters))
 
     # plt.scatter(x, y)
     # plt.scatter(y, x)
     # plt.show()
 
+    csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
+    datasets = load_datasets(csv_names)
 
-
-    # csv_names = ['airfoil', 'concrete', 'forestfires', 'machine', 'yacht']
-    # datasets = load_datasets(csv_names)
-
-    '''for name in csv_names:
+    for name in csv_names:
         aco = ACO.ACO(data=datasets[name])
-        aco.main(name)'''
+        clusters = aco.main(name, max_iter=1000000)
+        print("{0} clusters: {1}".format(name, len(clusters.keys())))
+    # print(clusters)
+
+    # graph2dClusters(clusters)
 
     '''clusters = KM.train(gen_data(), 5)
     print(clusters)
@@ -131,6 +145,7 @@ def graph2dClusters(data):
 
     plt.show()
 
+
 def evaluate_clusters(clusters):
     centers = []
     average_dist = 0
@@ -150,7 +165,8 @@ def evaluate_clusters(clusters):
             for point in cluster:
                 average_dist = average_dist + KM.euclidian_distance(point, center_point)
 
-    return average_dist/num_points
+    return average_dist / num_points
+
 
 if __name__ == '__main__':
     main()
